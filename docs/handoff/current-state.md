@@ -37,7 +37,7 @@
 - [ ] Slice 2: Supabase schema + migrations
 - [x] Slice 3: Postmark inbound email connector
 - [x] Slice 4: Tally form webhook connector
-- [ ] Slice 5: Gatekeeper agent
+- [x] Slice 5: Gatekeeper agent
 - [ ] Slice 6: Router agent
 - [ ] Slice 7: Operator agent (safe actions only)
 - [ ] Slice 8: Approvals flow + Slack integration
@@ -55,7 +55,7 @@
 - Treating security and channel trust as setup details rather than product-level concerns
 
 ## Next Task
-Slice 5: Gatekeeper agent. Plan first, then implement.
+Slice 6: Router agent. Plan first, then implement.
 
 ## Last Updated
-2026-03-31 — Slice 4 complete: Tally form connector, ParsedEmail → ParsedInbound rename, /inbound/form wired to 202, 18 tests passing
+2026-03-31 — Slice 5 complete: Gatekeeper agent, db/{events,entities,actions,health_logs}.py, select-first dedup with constraint safety net, asyncio.to_thread, pytest.ini (asyncio auto mode), 23 tests passing

@@ -41,7 +41,8 @@ class EventCreate(BaseModel):
     source_id: str | None = None
     raw_payload: dict[str, Any]
     schema_version: str = "v1"
-    # Normalized fields — populated by Gatekeeper after initial insert
+    status: str = "received"
+    # Normalized fields — populated by Gatekeeper
     sender_name: str | None = None
     sender_email: str | None = None
     subject: str | None = None

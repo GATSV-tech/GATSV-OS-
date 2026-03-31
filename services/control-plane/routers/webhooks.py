@@ -4,6 +4,7 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Query, Request
 from fastapi.responses import JSONResponse
 
+from agents import gatekeeper
 from config import settings
 from connectors.email import parse_postmark_inbound
 from connectors.form import parse_tally_inbound
@@ -48,11 +49,10 @@ async def inbound_email(
 
     raw = await request.json()
     parsed = parse_postmark_inbound(raw)
+    result = await gatekeeper.run(parsed)
     logger.debug(
-        "Inbound email parsed: source_id=%s sender=%s subject=%r",
-        parsed.source_id,
-        parsed.sender_email,
-        parsed.subject,
+        "Gatekeeper result: status=%s event_id=%s source_id=%s",
+        result.status, result.event_id, parsed.source_id,
     )
     return {"received": True}
 
@@ -87,9 +87,9 @@ async def inbound_form(
 
     raw = await request.json()
     parsed = parse_tally_inbound(raw)
+    result = await gatekeeper.run(parsed)
     logger.debug(
-        "Inbound form parsed: source_id=%s sender=%s",
-        parsed.source_id,
-        parsed.sender_email,
+        "Gatekeeper result: status=%s event_id=%s source_id=%s",
+        result.status, result.event_id, parsed.source_id,
     )
     return {"received": True}
