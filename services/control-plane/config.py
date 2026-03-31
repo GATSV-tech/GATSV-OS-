@@ -35,6 +35,12 @@ class Settings(BaseSettings):
     # Tally — required for form connector (Slice 4+)
     tally_webhook_secret: Optional[str] = None
 
+    # Sendblue — required for iMessage connector (Slice 6+)
+    sendblue_api_key: Optional[str] = None
+    sendblue_api_secret: Optional[str] = None
+    sendblue_from_number: Optional[str] = None
+    sendblue_webhook_secret: Optional[str] = None
+
 
 # Single shared instance — import this everywhere, never instantiate Settings again
 settings = Settings()

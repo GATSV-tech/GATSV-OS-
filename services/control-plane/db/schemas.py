@@ -21,6 +21,7 @@ class EntityCreate(BaseModel):
     type: str  # 'contact' | 'company'
     name: str | None = None
     email: str | None = None
+    phone: str | None = None
     company: str | None = None
     metadata: dict[str, Any] = {}
 

@@ -19,6 +19,7 @@ class ParsedInbound(BaseModel):
     raw_payload: dict[str, Any]
     sender_name: str | None
     sender_email: str | None
+    sender_phone: str | None = None  # E.164; populated by phone-based sources (iMessage, SMS)
     subject: str | None
     body: str | None
     received_at: datetime | None

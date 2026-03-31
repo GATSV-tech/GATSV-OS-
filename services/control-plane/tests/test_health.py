@@ -73,3 +73,27 @@ def test_inbound_form_accepts_correct_token():
         response = client.post("/inbound/form?token=tally-secret", json={})
     assert response.status_code == 202
     assert response.json() == {"received": True}
+
+
+def test_inbound_imessage_returns_202():
+    """iMessage endpoint returns 202 with no secret configured (dev mode)."""
+    with _PATCH_GK:
+        response = client.post("/inbound/imessage", json={})
+    assert response.status_code == 202
+    assert response.json() == {"received": True}
+
+
+def test_inbound_imessage_rejects_wrong_token():
+    """When Sendblue secret is configured, wrong token returns 401."""
+    with patch.object(settings, "sendblue_webhook_secret", "sb-secret"):
+        response = client.post("/inbound/imessage?token=wrong-token", json={})
+    assert response.status_code == 401
+    assert response.json() == {"error": "unauthorized"}
+
+
+def test_inbound_imessage_accepts_correct_token():
+    """When Sendblue secret is configured, correct token reaches Gatekeeper and returns 202."""
+    with patch.object(settings, "sendblue_webhook_secret", "sb-secret"), _PATCH_GK:
+        response = client.post("/inbound/imessage?token=sb-secret", json={})
+    assert response.status_code == 202
+    assert response.json() == {"received": True}

@@ -93,7 +93,7 @@ async def _normalize(parsed: ParsedInbound, start: float) -> GatekeeperResult:
 
     # 2. Upsert entity
     entity = await asyncio.to_thread(
-        db_entities.upsert_by_email, parsed.sender_email, parsed.sender_name
+        db_entities.upsert_by_contact, parsed.sender_email, parsed.sender_phone, parsed.sender_name
     )
 
     # 3. Create event — returns None on unique-constraint race

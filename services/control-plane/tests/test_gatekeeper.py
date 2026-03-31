@@ -39,7 +39,7 @@ def _parsed(**kwargs) -> ParsedInbound:
 @patch("agents.gatekeeper.db_health_logs.create", return_value=MOCK_HEALTH_LOG)
 @patch("agents.gatekeeper.db_actions.create", return_value=MOCK_ACTION)
 @patch("agents.gatekeeper.db_events.create", return_value=MOCK_EVENT)
-@patch("agents.gatekeeper.db_entities.upsert_by_email", return_value=MOCK_ENTITY)
+@patch("agents.gatekeeper.db_entities.upsert_by_contact", return_value=MOCK_ENTITY)
 @patch("agents.gatekeeper.db_events.find_by_source", return_value=None)
 async def test_new_event_created(mock_find, mock_entity, mock_ev_create, mock_action, mock_hl):
     """Happy path: new entity and event are created, audit trail written."""
@@ -52,7 +52,7 @@ async def test_new_event_created(mock_find, mock_entity, mock_ev_create, mock_ac
     assert result.duration_ms >= 0
 
     mock_find.assert_called_once_with("email", "msg-123")
-    mock_entity.assert_called_once_with("marcus@brightpath.io", "Marcus Rivera")
+    mock_entity.assert_called_once_with("marcus@brightpath.io", None, "Marcus Rivera")
     mock_ev_create.assert_called_once()
     mock_action.assert_called_once()
     mock_hl.assert_called_once()
@@ -61,7 +61,7 @@ async def test_new_event_created(mock_find, mock_entity, mock_ev_create, mock_ac
 @patch("agents.gatekeeper.db_health_logs.create", return_value=MOCK_HEALTH_LOG)
 @patch("agents.gatekeeper.db_actions.create", return_value=MOCK_ACTION)
 @patch("agents.gatekeeper.db_events.create")
-@patch("agents.gatekeeper.db_entities.upsert_by_email")
+@patch("agents.gatekeeper.db_entities.upsert_by_contact")
 @patch("agents.gatekeeper.db_events.find_by_source", return_value=MOCK_EVENT)
 async def test_select_dedup_returns_duplicate(mock_find, mock_entity, mock_ev_create, mock_action, mock_hl):
     """Existing event found by select — returns duplicate without touching entity or events."""
@@ -79,7 +79,7 @@ async def test_select_dedup_returns_duplicate(mock_find, mock_entity, mock_ev_cr
 @patch("agents.gatekeeper.db_health_logs.create", return_value=MOCK_HEALTH_LOG)
 @patch("agents.gatekeeper.db_actions.create", return_value=MOCK_ACTION)
 @patch("agents.gatekeeper.db_events.create", return_value=None)   # None = constraint hit
-@patch("agents.gatekeeper.db_entities.upsert_by_email", return_value=MOCK_ENTITY)
+@patch("agents.gatekeeper.db_entities.upsert_by_contact", return_value=MOCK_ENTITY)
 @patch("agents.gatekeeper.db_events.find_by_source", return_value=None)
 async def test_constraint_dedup_returns_duplicate(mock_find, mock_entity, mock_ev_create, mock_action, mock_hl):
     """Race-condition: select missed, insert returned None (unique constraint). Returns duplicate."""
@@ -94,7 +94,7 @@ async def test_constraint_dedup_returns_duplicate(mock_find, mock_entity, mock_e
 @patch("agents.gatekeeper.db_health_logs.create", return_value=MOCK_HEALTH_LOG)
 @patch("agents.gatekeeper.db_actions.create", return_value=MOCK_ACTION)
 @patch("agents.gatekeeper.db_events.create", return_value=MOCK_EVENT)
-@patch("agents.gatekeeper.db_entities.upsert_by_email", return_value=MOCK_ENTITY)
+@patch("agents.gatekeeper.db_entities.upsert_by_contact", return_value=MOCK_ENTITY)
 @patch("agents.gatekeeper.db_events.find_by_source")
 async def test_no_source_id_skips_dedup(mock_find, mock_entity, mock_ev_create, mock_action, mock_hl):
     """When source_id is None, dedup select is skipped entirely."""
@@ -109,7 +109,7 @@ async def test_no_source_id_skips_dedup(mock_find, mock_entity, mock_ev_create, 
 @patch("agents.gatekeeper.db_health_logs.create", return_value=MOCK_HEALTH_LOG)
 @patch("agents.gatekeeper.db_actions.create", return_value=MOCK_ACTION)
 @patch("agents.gatekeeper.db_events.create")
-@patch("agents.gatekeeper.db_entities.upsert_by_email", side_effect=RuntimeError("DB connection lost"))
+@patch("agents.gatekeeper.db_entities.upsert_by_contact", side_effect=RuntimeError("DB connection lost"))
 @patch("agents.gatekeeper.db_events.find_by_source", return_value=None)
 async def test_unrecoverable_error_propagates(mock_find, mock_entity, mock_ev_create, mock_action, mock_hl):
     """Unrecoverable DB error propagates after writing an error health_log."""

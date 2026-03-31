@@ -8,6 +8,7 @@ from agents import gatekeeper
 from config import settings
 from connectors.email import parse_postmark_inbound
 from connectors.form import parse_tally_inbound
+from connectors.imessage import parse_sendblue_inbound
 
 logger = logging.getLogger(__name__)
 
@@ -16,6 +17,7 @@ router = APIRouter(tags=["webhooks"])
 # Warn once per process if inbound secrets are not configured.
 _postmark_token_warned = False
 _tally_token_warned = False
+_sendblue_token_warned = False
 
 
 @router.post("/email", status_code=202)
@@ -87,6 +89,42 @@ async def inbound_form(
 
     raw = await request.json()
     parsed = parse_tally_inbound(raw)
+    result = await gatekeeper.run(parsed)
+    logger.debug(
+        "Gatekeeper result: status=%s event_id=%s source_id=%s",
+        result.status, result.event_id, parsed.source_id,
+    )
+    return {"received": True}
+
+
+@router.post("/imessage", status_code=202)
+async def inbound_imessage(
+    request: Request,
+    token: Annotated[str | None, Query()] = None,
+) -> Any:
+    """
+    Receives inbound iMessage/SMS/RCS payloads from Sendblue.
+
+    Token validation: if SENDBLUE_WEBHOOK_SECRET is set, the request must include
+    ?token=<secret> or it is rejected with 401. Register the webhook URL in Sendblue as:
+        https://yourdomain.com/inbound/imessage?token=YOUR_SECRET
+    """
+    global _sendblue_token_warned
+
+    if settings.sendblue_webhook_secret:
+        if token != settings.sendblue_webhook_secret:
+            logger.warning("Inbound iMessage rejected: invalid or missing token")
+            return JSONResponse(status_code=401, content={"error": "unauthorized"})
+    else:
+        if not _sendblue_token_warned:
+            logger.warning(
+                "SENDBLUE_WEBHOOK_SECRET is not set — "
+                "iMessage webhook endpoint is unauthenticated. Set this in production."
+            )
+            _sendblue_token_warned = True
+
+    raw = await request.json()
+    parsed = parse_sendblue_inbound(raw)
     result = await gatekeeper.run(parsed)
     logger.debug(
         "Gatekeeper result: status=%s event_id=%s source_id=%s",

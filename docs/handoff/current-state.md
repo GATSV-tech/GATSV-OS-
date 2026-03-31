@@ -38,11 +38,12 @@
 - [x] Slice 3: Postmark inbound email connector
 - [x] Slice 4: Tally form webhook connector
 - [x] Slice 5: Gatekeeper agent
-- [ ] Slice 6: Router agent
-- [ ] Slice 7: Operator agent (safe actions only)
-- [ ] Slice 8: Approvals flow + Slack integration
-- [ ] Slice 9: Reporter agent + daily digest
-- [ ] Slice 10: Auditor + health dashboard view
+- [x] Slice 6: Sendblue iMessage connector
+- [ ] Slice 7: Router agent
+- [ ] Slice 8: Operator agent (safe actions only)
+- [ ] Slice 9: Approvals flow + Slack integration
+- [ ] Slice 10: Reporter agent + daily digest
+- [ ] Slice 11: Auditor + health dashboard view
 
 ## Avoid
 - Turning this into a generic AI agency demo
@@ -55,7 +56,7 @@
 - Treating security and channel trust as setup details rather than product-level concerns
 
 ## Next Task
-Slice 6: Router agent. Plan first, then implement.
+Slice 7: Router agent. Plan first, then implement.
 
 ## Last Updated
-2026-03-31 — Slice 5 complete: Gatekeeper agent, db/{events,entities,actions,health_logs}.py, select-first dedup with constraint safety net, asyncio.to_thread, pytest.ini (asyncio auto mode), 23 tests passing
+2026-03-31 — Slice 6 complete: Sendblue iMessage connector, /inbound/imessage endpoint, message_handle as source_id, sender_phone on ParsedInbound, phone column migration (002_add_phone.sql), upsert_by_contact (email→phone→new), 31 tests passing
