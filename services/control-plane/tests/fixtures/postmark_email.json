@@ -1,0 +1,37 @@
+{
+  "FromName": "Sarah Chen",
+  "MessageStream": "inbound",
+  "From": "Sarah Chen <sarah.chen@acmeco.com>",
+  "FromFull": {
+    "Email": "sarah.chen@acmeco.com",
+    "Name": "Sarah Chen",
+    "MailboxHash": ""
+  },
+  "To": "\"GATSV Intake\" <intake@inbound.yourdomain.com>",
+  "ToFull": [
+    {
+      "Email": "intake@inbound.yourdomain.com",
+      "Name": "GATSV Intake",
+      "MailboxHash": ""
+    }
+  ],
+  "Cc": "",
+  "CcFull": [],
+  "Bcc": "",
+  "BccFull": [],
+  "OriginalRecipient": "intake@inbound.yourdomain.com",
+  "Subject": "Interested in your services",
+  "MessageID": "abc123def456@smtp.postmarkapp.com",
+  "ReplyTo": "",
+  "MailboxHash": "",
+  "Date": "Tue, 31 Mar 2026 10:15:00 +0000",
+  "TextBody": "Hi,\n\nI came across GATSV Systems and I'm interested in learning more about your AI operations setup. We're a small agency of 8 people and struggling to keep up with client coordination.\n\nWould love to set up a call.\n\nSarah",
+  "HtmlBody": "<html><body><p>Hi,</p><p>I came across GATSV Systems and I'm interested in learning more about your AI operations setup. We're a small agency of 8 people and struggling to keep up with client coordination.</p><p>Would love to set up a call.</p><p>Sarah</p></body></html>",
+  "StrippedTextReply": "",
+  "Tag": "",
+  "Headers": [
+    {"Name": "X-Spam-Status", "Value": "No"},
+    {"Name": "X-Spam-Score", "Value": "-0.1"}
+  ],
+  "Attachments": []
+}
