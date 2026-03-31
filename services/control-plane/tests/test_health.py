@@ -45,8 +45,24 @@ def test_inbound_email_accepts_correct_token():
     assert response.json() == {"received": True}
 
 
-def test_inbound_form_stub_returns_200():
-    """Form endpoint is still a stub, returns 200."""
+def test_inbound_form_returns_202():
+    """Form endpoint returns 202 with no secret configured (dev mode)."""
     response = client.post("/inbound/form", json={})
-    assert response.status_code == 200
+    assert response.status_code == 202
+    assert response.json() == {"received": True}
+
+
+def test_inbound_form_rejects_wrong_token():
+    """When Tally secret is configured, wrong token returns 401."""
+    with patch.object(settings, "tally_webhook_secret", "tally-secret"):
+        response = client.post("/inbound/form?token=wrong-token", json={})
+    assert response.status_code == 401
+    assert response.json() == {"error": "unauthorized"}
+
+
+def test_inbound_form_accepts_correct_token():
+    """When Tally secret is configured, correct token returns 202."""
+    with patch.object(settings, "tally_webhook_secret", "tally-secret"):
+        response = client.post("/inbound/form?token=tally-secret", json={})
+    assert response.status_code == 202
     assert response.json() == {"received": True}

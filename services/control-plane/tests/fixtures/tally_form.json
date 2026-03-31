@@ -1,0 +1,40 @@
+{
+  "eventId": "evt_tally_001",
+  "createdAt": "2026-03-31T10:20:00.000Z",
+  "data": {
+    "responseId": "resp_abc789xyz",
+    "submittedAt": "2026-03-31T10:20:00.000Z",
+    "fields": [
+      {
+        "key": "q_name",
+        "label": "Full Name",
+        "type": "INPUT_TEXT",
+        "value": "Marcus Rivera"
+      },
+      {
+        "key": "q_email",
+        "label": "Email Address",
+        "type": "INPUT_EMAIL",
+        "value": "marcus.rivera@brightpath.io"
+      },
+      {
+        "key": "q_company",
+        "label": "Company",
+        "type": "INPUT_TEXT",
+        "value": "Brightpath Agency"
+      },
+      {
+        "key": "q_team_size",
+        "label": "Team Size",
+        "type": "INPUT_NUMBER",
+        "value": 6
+      },
+      {
+        "key": "q_message",
+        "label": "What are you struggling with?",
+        "type": "TEXTAREA",
+        "value": "We're a 6-person agency and client coordination is a mess. Spending too much time on status updates and intake."
+      }
+    ]
+  }
+}

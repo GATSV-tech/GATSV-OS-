@@ -6,13 +6,15 @@ from fastapi.responses import JSONResponse
 
 from config import settings
 from connectors.email import parse_postmark_inbound
+from connectors.form import parse_tally_inbound
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["webhooks"])
 
-# Warn once per process if the inbound email secret is not configured.
+# Warn once per process if inbound secrets are not configured.
 _postmark_token_warned = False
+_tally_token_warned = False
 
 
 @router.post("/email", status_code=202)
@@ -55,11 +57,39 @@ async def inbound_email(
     return {"received": True}
 
 
-@router.post("/form")
-async def inbound_form(request: Request) -> dict:
+@router.post("/form", status_code=202)
+async def inbound_form(
+    request: Request,
+    token: Annotated[str | None, Query()] = None,
+) -> Any:
     """
     Receives form submission payloads from Tally.
-    Stub — processing added in Slice 4 (Tally connector) and Slice 5 (Gatekeeper).
+
+    Token validation: if TALLY_WEBHOOK_SECRET is set, the request must include
+    ?token=<secret> or it is rejected with 401. Configure the Tally webhook URL as:
+        https://yourdomain.com/inbound/form?token=YOUR_SECRET
+
+    Full processing (Gatekeeper) is wired in Slice 5.
     """
-    logger.info("Inbound form webhook received (stub)")
+    global _tally_token_warned
+
+    if settings.tally_webhook_secret:
+        if token != settings.tally_webhook_secret:
+            logger.warning("Inbound form rejected: invalid or missing token")
+            return JSONResponse(status_code=401, content={"error": "unauthorized"})
+    else:
+        if not _tally_token_warned:
+            logger.warning(
+                "TALLY_WEBHOOK_SECRET is not set — "
+                "form webhook endpoint is unauthenticated. Set this in production."
+            )
+            _tally_token_warned = True
+
+    raw = await request.json()
+    parsed = parse_tally_inbound(raw)
+    logger.debug(
+        "Inbound form parsed: source_id=%s sender=%s",
+        parsed.source_id,
+        parsed.sender_email,
+    )
     return {"received": True}

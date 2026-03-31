@@ -2,7 +2,7 @@
 Postmark inbound email connector.
 
 Receives raw Postmark inbound webhook payloads and returns a source-agnostic
-ParsedEmail for the Gatekeeper to consume.
+ParsedInbound for the Gatekeeper to consume.
 
 Never writes to the database. Never raises on missing optional fields.
 """
@@ -14,6 +14,8 @@ from email.utils import parsedate_to_datetime
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict
+
+from connectors.base import ParsedInbound
 
 logger = logging.getLogger(__name__)
 
@@ -41,31 +43,16 @@ class PostmarkInboundPayload(BaseModel):
     ReplyTo: str = ""
 
 
-# ─── Output model ─────────────────────────────────────────────────────────────
-
-class ParsedEmail(BaseModel):
-    """Source-agnostic email representation. Consumed by the Gatekeeper (Slice 5)."""
-
-    source: str = "email"
-    source_id: str | None
-    raw_payload: dict[str, Any]
-    sender_name: str | None
-    sender_email: str | None
-    subject: str | None
-    body: str | None
-    received_at: datetime | None
-
-
 # ─── Public parser ────────────────────────────────────────────────────────────
 
-def parse_postmark_inbound(raw: dict[str, Any]) -> ParsedEmail:
+def parse_postmark_inbound(raw: dict[str, Any]) -> ParsedInbound:
     """
-    Parse a raw Postmark inbound webhook payload into a ParsedEmail.
-    Always returns a ParsedEmail — never raises on missing optional fields.
+    Parse a raw Postmark inbound webhook payload into a ParsedInbound.
+    Always returns a ParsedInbound — never raises on missing optional fields.
     """
     payload = PostmarkInboundPayload.model_validate(raw)
 
-    return ParsedEmail(
+    return ParsedInbound(
         source="email",
         source_id=_clean_message_id(payload.MessageID),
         raw_payload=raw,

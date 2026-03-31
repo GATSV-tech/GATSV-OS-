@@ -36,7 +36,7 @@
 - [x] Slice 1: Repo skeleton + Docker + env setup
 - [ ] Slice 2: Supabase schema + migrations
 - [x] Slice 3: Postmark inbound email connector
-- [ ] Slice 4: Tally form webhook connector
+- [x] Slice 4: Tally form webhook connector
 - [ ] Slice 5: Gatekeeper agent
 - [ ] Slice 6: Router agent
 - [ ] Slice 7: Operator agent (safe actions only)
@@ -55,7 +55,7 @@
 - Treating security and channel trust as setup details rather than product-level concerns
 
 ## Next Task
-Slice 4: Tally form webhook connector. Plan first, then implement.
+Slice 5: Gatekeeper agent. Plan first, then implement.
 
 ## Last Updated
-2026-03-31 — Slice 3 complete: Postmark email connector, token validation, 11 tests passing
+2026-03-31 — Slice 4 complete: Tally form connector, ParsedEmail → ParsedInbound rename, /inbound/form wired to 202, 18 tests passing

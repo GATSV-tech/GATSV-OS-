@@ -6,7 +6,8 @@ Pure unit tests — no HTTP client, no database.
 import json
 from pathlib import Path
 
-from connectors.email import ParsedEmail, parse_postmark_inbound
+from connectors.base import ParsedInbound
+from connectors.email import parse_postmark_inbound
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -20,7 +21,7 @@ def test_parse_full_payload():
     raw = _load("postmark_email.json")
     result = parse_postmark_inbound(raw)
 
-    assert isinstance(result, ParsedEmail)
+    assert isinstance(result, ParsedInbound)
     assert result.source == "email"
     assert result.source_id == "abc123def456@smtp.postmarkapp.com"
     assert result.sender_email == "sarah.chen@acmeco.com"
