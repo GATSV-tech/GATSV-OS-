@@ -5,6 +5,7 @@ from fastapi import APIRouter, Query, Request
 from fastapi.responses import JSONResponse
 
 from agents import gatekeeper
+from agents import chat
 from config import settings
 from connectors.email import parse_postmark_inbound
 from connectors.form import parse_tally_inbound
@@ -32,8 +33,6 @@ async def inbound_email(
     must include ?token=<secret> or it is rejected with 401. Configure the
     Postmark inbound server webhook URL as:
         https://yourdomain.com/inbound/email?token=YOUR_SECRET
-
-    Full processing (Gatekeeper) is wired in Slice 5.
     """
     global _postmark_token_warned
 
@@ -70,8 +69,6 @@ async def inbound_form(
     Token validation: if TALLY_WEBHOOK_SECRET is set, the request must include
     ?token=<secret> or it is rejected with 401. Configure the Tally webhook URL as:
         https://yourdomain.com/inbound/form?token=YOUR_SECRET
-
-    Full processing (Gatekeeper) is wired in Slice 5.
     """
     global _tally_token_warned
 
@@ -129,5 +126,34 @@ async def inbound_imessage(
     logger.debug(
         "Gatekeeper result: status=%s event_id=%s source_id=%s",
         result.status, result.event_id, parsed.source_id,
+    )
+
+    if parsed.body:
+        await chat.run(parsed)
+
+    return {"received": True}
+
+
+@router.post("/imessage/status", status_code=202)
+async def inbound_imessage_status(
+    request: Request,
+    token: Annotated[str | None, Query()] = None,
+) -> Any:
+    """
+    Receives Sendblue delivery status callbacks for outbound messages.
+    Status updates (SENT, DELIVERED, ERROR, etc.) are logged for observability.
+    Slice 7: log only. Slice 8+ will persist to DB for cost and delivery tracking.
+    """
+    if settings.sendblue_webhook_secret:
+        if token != settings.sendblue_webhook_secret:
+            logger.warning("iMessage status callback rejected: invalid or missing token")
+            return JSONResponse(status_code=401, content={"error": "unauthorized"})
+
+    raw = await request.json()
+    logger.info(
+        "Sendblue delivery status: handle=%s status=%s to=%s",
+        raw.get("message_handle"),
+        raw.get("status"),
+        raw.get("number"),
     )
     return {"received": True}

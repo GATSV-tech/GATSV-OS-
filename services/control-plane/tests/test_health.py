@@ -8,9 +8,10 @@ from main import app
 
 client = TestClient(app)
 
-# Reusable mock for gatekeeper.run — prevents real DB calls in webhook endpoint tests.
+# Reusable mocks — prevent real DB and API calls in webhook endpoint tests.
 _MOCK_GK_RESULT = GatekeeperResult(event_id="event-uuid-1", entity_id="entity-uuid-1", status="created", duration_ms=5)
 _PATCH_GK = patch("routers.webhooks.gatekeeper.run", new_callable=AsyncMock, return_value=_MOCK_GK_RESULT)
+_PATCH_CHAT = patch("routers.webhooks.chat.run", new_callable=AsyncMock, return_value=None)
 
 
 def test_health_returns_200():
@@ -77,7 +78,7 @@ def test_inbound_form_accepts_correct_token():
 
 def test_inbound_imessage_returns_202():
     """iMessage endpoint returns 202 with no secret configured (dev mode)."""
-    with _PATCH_GK:
+    with _PATCH_GK, _PATCH_CHAT:
         response = client.post("/inbound/imessage", json={})
     assert response.status_code == 202
     assert response.json() == {"received": True}
@@ -93,7 +94,22 @@ def test_inbound_imessage_rejects_wrong_token():
 
 def test_inbound_imessage_accepts_correct_token():
     """When Sendblue secret is configured, correct token reaches Gatekeeper and returns 202."""
-    with patch.object(settings, "sendblue_webhook_secret", "sb-secret"), _PATCH_GK:
+    with patch.object(settings, "sendblue_webhook_secret", "sb-secret"), _PATCH_GK, _PATCH_CHAT:
         response = client.post("/inbound/imessage?token=sb-secret", json={})
     assert response.status_code == 202
     assert response.json() == {"received": True}
+
+
+def test_inbound_imessage_status_returns_202():
+    """Status callback endpoint returns 202 with no secret configured."""
+    response = client.post("/inbound/imessage/status", json={"status": "DELIVERED", "message_handle": "abc"})
+    assert response.status_code == 202
+    assert response.json() == {"received": True}
+
+
+def test_inbound_imessage_status_rejects_wrong_token():
+    """Status callback rejects wrong token with 401."""
+    with patch.object(settings, "sendblue_webhook_secret", "sb-secret"):
+        response = client.post("/inbound/imessage/status?token=wrong", json={})
+    assert response.status_code == 401
+    assert response.json() == {"error": "unauthorized"}

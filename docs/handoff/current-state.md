@@ -1,62 +1,40 @@
-# GATSV OS Core — Session Handoff
+# GATSV OS — Session Handoff
 
-## Decided
-- Internal codename: GATSV OS Core v1. Final customer-facing product name not locked yet.
-- ICP (current): founder-led service businesses and small agencies with 2–15 people that have
-  recurring inbound work, client delivery, and ongoing coordination needs. Intentionally narrower
-  than "all small businesses." To be narrowed further before production sales.
-- v1 scope: intake, routing, founder visibility, approvals, observability
-- Custom control layer (FastAPI), not n8n-dependent
-- Supabase as primary data + memory layer
-- Claude Code + Ruflo as internal build/ops workflow
-- Observability is a core product requirement from v1 — not internal tooling. Must produce logs,
-  traces, cost visibility, approval state, and failure visibility on every major action. The
-  observability layer is designed to be extractable as a future product (GATSV Ops).
-- v1 operator surface = Slack (approvals, alerts, summaries, commands). Strong tactical v1
-  interface; architecture remains channel-agnostic so surfaces are replaceable.
-- Discord = secondary/fallback option for team or channel-based collaboration if needed
-- WhatsApp = possible future optional personal/mobile interface, not primary v1 surface
-- Telegram = not used as an operating channel for this project
-- v2/vNext admin surface = lightweight web dashboard (deferred until event loop is proven)
-- First two inbound sources: Postmark inbound email + Tally form webhook
-- Architecture plan approved — see `docs/architecture/v1.md`
+## Project Focus
+Personal iMessage Claude bot. Jake texts it and it replies. It can proactively
+send reminders, daily summaries, and timed notifications. The bot runs on the
+same FastAPI control plane; Supabase stores conversation history and scheduled
+tasks. Sendblue is the iMessage transport layer.
 
-## Not Decided Yet
-- Exact ICP narrowing before production sales
-- Exact first external beta client
-- Pricing model and go-to-market timing
-- Exact Slack interaction pattern for v1 (DMs vs. channels vs. threads vs. hybrid)
-- Exact first two inbound sources (Postmark + Tally are current recommendation, not final)
-- Exact outbound/provider choices where relevant
-- Exact first web dashboard implementation path (v2)
-- Auth strategy for multi-tenant (single founder use for now)
-- Whether any additional constraints should be added before Slice 1 starts
+Slices 1–6 built the inbound pipeline and connectors. Slices 7+ are focused
+entirely on the bot loop.
+
+Slices 3 (Postmark) and 4 (Tally) are built and tested but not core to the bot;
+left in place, not extended.
+
+## Stack
+- Control plane: Python + FastAPI (async)
+- Database: Supabase (PostgreSQL + pgvector)
+- AI: Anthropic Claude SDK (primary)
+- iMessage transport: Sendblue
+- Infra: VPS + Docker + GitHub
 
 ## Implementation Slices (Status)
 - [x] Slice 1: Repo skeleton + Docker + env setup
-- [ ] Slice 2: Supabase schema + migrations
+- [x] Slice 2: Supabase schema + migrations
 - [x] Slice 3: Postmark inbound email connector
 - [x] Slice 4: Tally form webhook connector
 - [x] Slice 5: Gatekeeper agent
 - [x] Slice 6: Sendblue iMessage connector
-- [ ] Slice 7: Router agent
-- [ ] Slice 8: Operator agent (safe actions only)
-- [ ] Slice 9: Approvals flow + Slack integration
-- [ ] Slice 10: Reporter agent + daily digest
-- [ ] Slice 11: Auditor + health dashboard view
-
-## Avoid
-- Turning this into a generic AI agency demo
-- Drifting toward generic software for all small businesses
-- Building too broad a platform before the event model is stable
-- Adding integrations before the core event/action loop is proven
-- Skipping the approval layer to ship faster
-- Coupling agent logic to any specific channel or interface
-- Using Telegram as an operating channel for this project
-- Treating security and channel trust as setup details rather than product-level concerns
+- [x] Slice 7: Claude reply loop — inbound iMessage → Claude API → Sendblue outbound reply
+- [ ] Slice 8: Conversation memory — rolling context window persisted in Supabase
+- [ ] Slice 9: Proactive outbound — scheduled reminders and timed notifications
+- [ ] Slice 10: Daily summaries and digest
 
 ## Next Task
-Slice 7: Router agent. Plan first, then implement.
+Slice 8: Conversation memory — rolling context window persisted in Supabase.
 
 ## Last Updated
-2026-03-31 — Slice 6 complete: Sendblue iMessage connector, /inbound/imessage endpoint, message_handle as source_id, sender_phone on ParsedInbound, phone column migration (002_add_phone.sql), upsert_by_contact (email→phone→new), 31 tests passing
+2026-03-31 — Slice 7 complete: Claude reply loop, connectors/sendblue_send.py (with
+status_callback), agents/chat.py (AsyncAnthropic, error → health_log → None),
+POST /inbound/imessage/status, db/migrations/003_add_chat_agent.sql, 42 tests passing.

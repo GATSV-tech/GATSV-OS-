@@ -41,6 +41,10 @@ class Settings(BaseSettings):
     sendblue_from_number: Optional[str] = None
     sendblue_webhook_secret: Optional[str] = None
 
+    # Base URL of this service — used to construct status_callback URLs (Slice 7+)
+    # Example: https://yourdomain.com
+    app_base_url: Optional[str] = None
+
 
 # Single shared instance — import this everywhere, never instantiate Settings again
 settings = Settings()
