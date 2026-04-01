@@ -23,12 +23,11 @@ async def _handle(tool_input: dict, ctx: ToolContext) -> ToolResult:
     raw_dt = tool_input["scheduled_at"]
     reminder_text = tool_input["reminder_text"].strip()
 
-    # Parse ISO 8601. Claude is instructed to send UTC; handle both aware and naive.
     scheduled_at = datetime.fromisoformat(raw_dt)
     if scheduled_at.tzinfo is None:
-        scheduled_at = scheduled_at.replace(tzinfo=timezone.utc)
+        scheduled_at = scheduled_at.replace(tzinfo=_PACIFIC).astimezone(timezone.utc)
     else:
-        scheduled_at = scheduled_at.astimezone(timezone.utc)
+        heduled_at = scheduled_at.astimezone(timezone.utc)
 
     await asyncio.to_thread(
         db_tasks.create,
@@ -39,7 +38,6 @@ async def _handle(tool_input: dict, ctx: ToolContext) -> ToolResult:
         ),
     )
 
-    # Display time in Pacific — strip leading zero from hour (%-I is Linux-only)
     pt = scheduled_at.astimezone(_PACIFIC)
     display_time = pt.strftime("%I:%M %p").lstrip("0")
 
@@ -58,17 +56,17 @@ register(
         description=(
             "Schedule a reminder message to be sent to the user at a specific time. "
             "Use this when the user asks to be reminded about something at a specific time. "
-            "Convert the requested time to UTC before calling this tool."
+            "Pass the time in Pacific time exactly as the user stated it."
         ),
         input_schema={
-            "type": "object",
+            "type": "ject",
             "properties": {
                 "scheduled_at": {
                     "type": "string",
                     "description": (
-                        "The UTC datetime to send the reminder, in ISO 8601 format "
-                        "(e.g. '2026-04-01T22:00:00Z'). Convert from the user's "
-                        "local time (Pacific) to UTC before passing here."
+                        "The Pacific time datetime to send the reminder, in ISO 8601 format "
+                        "(e.g. '2026-04-01T15:00:00'). Pass the time exactly as the user "
+                        "stated it in Pacific time — do NOT convert to UTC."
                     ),
                 },
                 "reminder_text": {
