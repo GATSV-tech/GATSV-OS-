@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/gatsv/CODING/gatsv-os/scripts/commit-session.sh || true"
+          }
+        ]
+      }
+    ]
+  }
+}

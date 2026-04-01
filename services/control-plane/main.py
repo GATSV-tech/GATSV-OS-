@@ -4,9 +4,10 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from config import settings
-from routers import health, webhooks
+from routers import health, webhooks, slack_router
 from scheduler import runner as task_scheduler
 from scheduler import digest as digest_scheduler
+from scheduler import slack_scheduler
 
 logging.basicConfig(
     level=getattr(logging, settings.log_level.upper(), logging.INFO),
@@ -31,10 +32,13 @@ async def lifespan(app: FastAPI):
             "Set this in .env to enable proactive sends."
         )
 
+    slack_scheduler.start()
+
     yield
 
     task_scheduler.stop()
     digest_scheduler.stop()
+    slack_scheduler.stop()
     logger.info("GATSV OS Control Plane shutting down")
 
 
@@ -48,3 +52,4 @@ app = FastAPI(
 
 app.include_router(health.router)
 app.include_router(webhooks.router, prefix="/inbound")
+app.include_router(slack_router.router)

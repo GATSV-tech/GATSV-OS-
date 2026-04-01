@@ -1,6 +1,70 @@
 # GATSV OS — Session Handoff
 
 ## Last Updated
+2026-04-01 — Slack operator surface complete (Slice 13)
+
+**New env vars required:**
+- `SLACK_BOT_TOKEN` — bot OAuth token (xoxb-...)
+- `SLACK_SIGNING_SECRET` — for verifying inbound interaction callbacks
+- `SLACK_OPS_CHANNEL_ID` — channel ID to post to (e.g. C0123ABCDEF)
+
+All three are optional in dev — the surface degrades gracefully if not set.
+
+**New config keys** (with defaults, no restart required for summary time change):
+- `SLACK_POLL_INTERVAL_SECONDS=60`
+- `SLACK_SUMMARY_TIME_PT=08:00`
+
+**New endpoint:**
+- `POST /slack/interactions` — Slack Interactive Components webhook.
+  Register this URL in your Slack app's Interactivity & Shortcuts settings.
+  Slack signs every request; the endpoint verifies the signature before acting.
+
+**New Slack app permissions needed (Bot Token Scopes):**
+- `chat:write` — to post messages
+- `channels:read` — to resolve channel names (optional)
+
+**Four features:**
+
+1. **Approvals queue** (`post_approvals_queue()`):
+   Queries `approvals` where `decision IS NULL AND notified_at IS NULL`.
+   Posts each as a Block Kit message with ✅ Approve / ❌ Reject buttons.
+   Sets `notified_at` after posting so it won't re-post on the next poll.
+
+2. **Button callbacks** (`POST /slack/interactions` → `handle_approval_action()`):
+   Parses `action_id` as `{approve|reject}_{approval_uuid}`.
+   Updates `approvals.decision` + linked `actions.status`. Posts a confirmation.
+   Returns 200 immediately (background task); complies with Slack's 3s window.
+
+3. **Daily summary** (`post_daily_summary()`):
+   Block Kit summary: events by bucket (last 24h), open approvals count, agent cost.
+   Posted at `SLACK_SUMMARY_TIME_PT` Pacific. No LLM call — pure data.
+
+4. **Error alerts** (`post_error_alert(errors)`):
+   Called by the poll loop when health_log errors appear since the last tick.
+   Batches all new errors into one message with service names and previews.
+
+**Files created/modified:**
+- `connectors/slack.py` — httpx Slack client + HMAC-SHA256 signature verification
+- `db/slack_queries.py` — events_summary, actions_cost, open_approvals_count, recent_errors
+- `db/approvals.py` — added get_by_id, list_unnotified, mark_notified
+- `db/actions.py` — added update_status
+- `agents/slack_surface.py` — all four surface functions
+- `routers/slack_router.py` — interaction webhook
+- `scheduler/slack_scheduler.py` — poll loop + summary loop
+- `main.py` — wired slack_router + slack_scheduler
+- `config.py` — SLACK_POLL_INTERVAL_SECONDS, SLACK_SUMMARY_TIME_PT
+- `requirements.txt` — added python-multipart==0.0.9
+
+Tests: 120 passing (2 pre-existing failures in test_health.py).
+
+## Next Task
+- Deploy to VPS (Docker, env vars, Supabase prod connection, Slack app setup).
+- OR: Build outbound email connector (Postmark) to pick up pending send_ack actions.
+- OR: Build the Reporter agent for detailed event digests on demand.
+
+---
+
+## Last Updated
 2026-04-01 — Operator agent complete (Slice 12)
 
 Operator agent (`agents/operator.py`) is the third agent in the pipeline.

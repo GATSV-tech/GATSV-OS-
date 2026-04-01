@@ -16,6 +16,22 @@ from db.schemas import ApprovalCreate, ApprovalDecision
 logger = logging.getLogger(__name__)
 
 
+def get_by_id(approval_id: str) -> dict | None:
+    """Return the full approval row for approval_id, or None if not found."""
+    result = (
+        get_client()
+        .table("approvals")
+        .select(
+            "id, action_id, event_id, requested_by, summary, context, "
+            "options, decision, decided_by, decided_at, notified_at, created_at"
+        )
+        .eq("id", approval_id)
+        .limit(1)
+        .execute()
+    )
+    return result.data[0] if result.data else None
+
+
 def create(data: ApprovalCreate) -> dict:
     """Insert an approval request and return the full inserted row."""
     result = get_client().table("approvals").insert(data.model_dump(mode="json")).execute()
