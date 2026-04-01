@@ -29,12 +29,75 @@ left in place, not extended.
 - [x] Slice 7: Claude reply loop — inbound iMessage → Claude API → Sendblue outbound reply
 - [x] Slice 8: Conversation memory — rolling context window persisted in Supabase
 - [x] Slice 9: Proactive outbound — scheduled reminders and timed notifications
-- [ ] Slice 10: Daily summaries and digest
+- [x] Slice 10: Daily summaries, digest, and four new tools
 
 ## Next Task
-Slice 10: Daily summaries and digest.
+All 10 slices complete + 3 bugs fixed. Bot is feature-complete for v1. Possible next directions:
+- Deploy to VPS (Docker, env vars, Supabase prod connection)
+- Wire up Slack operator surface (CLAUDE.md calls this v1 interface for approvals/alerts)
+- Add a notes query tool (read back saved notes)
+- Build the Reporter agent (digest-style summaries for inbound event pipeline)
 
 ## Last Updated
+2026-04-01 — Bug fixes: duplicate sends, tool routing, reminder time
+
+**Bug 1 — Duplicate sends** (`scheduler/runner.py`):
+Reordered scheduler to claim (mark "sent") BEFORE calling Sendblue. If the
+claim fails, skip the send and leave the task pending for retry next tick.
+If send fails after a successful claim, mark "failed" and write health_log.
+Ordering: mark_status("sent") → send_message() → on error: mark_status("failed").
+
+**Bug 2 — Tool routing confusion** (all 5 tool descriptions):
+Added "Use ONLY when..." and "Do NOT use for:..." exclusion clauses to
+set_reminder, create_note, daily_brief, list_reminders, cancel_reminder.
+Prevents Claude from calling set_reminder for "note: ..." phrases or
+calling daily_brief for one-off reminder requests.
+
+**Bug 3 — Reminder time defaulting to ~now** (`agents/chat.py` + `agents/tools/set_reminder.py`):
+- System prompt changed from "Current time: ..." to "Current date and time: ..."
+  with cross-platform formatting (no %-I/%-d strftime specifiers).
+- set_reminder scheduled_at description extended with explicit today-vs-tomorrow
+  date resolution rules and a concrete worked example.
+
+Tests: 78 passing (2 pre-existing failures in test_health.py).
+test_scheduler.py rewritten to cover new claim-before-send ordering:
+new tests test_tick_skips_send_if_claim_fails and
+test_tick_claim_failure_does_not_block_remaining_tasks.
+
+## Last Updated (Slice 10)
+2026-04-01 — Slice 10 complete: daily digest + 4 new tools
+
+Digest: generates a morning summary (midnight-to-midnight Pacific window) of
+yesterday's inbound events, today's scheduled reminders, and overnight system
+errors. Claude writes the message. Sends via Sendblue. Fires on a daily asyncio
+loop (scheduler/digest.py) — reads send time from user_prefs each cycle so
+daily_brief changes take effect the following morning. Requires JAKE_PHONE_NUMBER
+env var; skips gracefully if not set.
+
+New tools (all registered via the tool registry):
+- create_note: saves freeform notes to notes table. "Remember that..."
+- list_reminders: returns formatted list of pending scheduled_tasks
+- cancel_reminder: cancels by content/time substring match, acks what was cancelled
+- daily_brief: upserts digest_send_time_pt in user_prefs, acks with next-morning time
+
+Bug fixes in set_reminder.py (from linter edit): heduled_at typo and "ject" type.
+
+New tables: notes, user_prefs (migration 006).
+System prompt in chat.py generalized — no longer mentions set_reminder by name.
+
+Files changed: db/migrations/006_add_notes_and_user_prefs.sql, db/notes.py,
+db/user_prefs.py, db/digest_queries.py, db/scheduled_tasks.py (list_pending),
+agents/tools/create_note.py, agents/tools/list_reminders.py,
+agents/tools/cancel_reminder.py, agents/tools/daily_brief.py,
+agents/tools/__init__.py, agents/chat.py (system prompt), agents/digest.py,
+scheduler/digest.py, main.py, config.py, tests/test_digest_agent.py,
+tests/test_new_tools.py.
+
+New env vars: JAKE_PHONE_NUMBER (required for digest), DIGEST_SEND_TIME_PT
+(default "07:00", overridable per-user via daily_brief tool).
+77 tests passing (2 pre-existing failures in test_health.py).
+
+## Last Updated (Slice 9)
 2026-04-01 — Slice 9 complete: proactive outbound with tool registry architecture.
 
 New table: scheduled_tasks (sender_phone, content, scheduled_at, status).
