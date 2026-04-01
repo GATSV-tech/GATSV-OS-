@@ -45,6 +45,12 @@ class Settings(BaseSettings):
     # Example: https://yourdomain.com
     app_base_url: Optional[str] = None
 
+    # Chat memory — rolling context window for the iMessage bot (Slice 8+)
+    # Number of messages (user + assistant combined) to load as context.
+    # Default 20 = ~10 exchanges. Must be an even number; odd values are fine but
+    # may load a partially-paired window.
+    chat_history_limit: int = 20
+
 
 # Single shared instance — import this everywhere, never instantiate Settings again
 settings = Settings()

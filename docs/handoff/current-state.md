@@ -27,14 +27,20 @@ left in place, not extended.
 - [x] Slice 5: Gatekeeper agent
 - [x] Slice 6: Sendblue iMessage connector
 - [x] Slice 7: Claude reply loop — inbound iMessage → Claude API → Sendblue outbound reply
-- [ ] Slice 8: Conversation memory — rolling context window persisted in Supabase
+- [x] Slice 8: Conversation memory — rolling context window persisted in Supabase
 - [ ] Slice 9: Proactive outbound — scheduled reminders and timed notifications
 - [ ] Slice 10: Daily summaries and digest
 
 ## Next Task
-Slice 8: Conversation memory — rolling context window persisted in Supabase.
+Slice 9: Proactive outbound — scheduled reminders and timed notifications.
 
 ## Last Updated
-2026-03-31 — Slice 7 complete: Claude reply loop, connectors/sendblue_send.py (with
-status_callback), agents/chat.py (AsyncAnthropic, error → health_log → None),
-POST /inbound/imessage/status, db/migrations/003_add_chat_agent.sql, 42 tests passing.
+2026-03-31 — Slice 8 complete: conversation memory wired into chat agent.
+New table chat_messages (sender_phone, role, content). User turn saved before
+Claude call to prevent loss on generation failure. History fetched newest-first
+then reversed to chronological order. Assistant turn saved after reply sent.
+DB failures on append are logged but never crash the reply. Window size
+configurable via CHAT_HISTORY_LIMIT env var (default 20). Files changed:
+db/migrations/004_add_chat_messages.sql, db/chat_messages.py, agents/chat.py,
+config.py, tests/test_chat_agent.py. 51 tests passing (2 pre-existing failures
+in test_health.py unrelated to this slice).

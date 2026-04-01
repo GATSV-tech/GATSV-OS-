@@ -1,14 +1,23 @@
 """
 Chat agent — the personal iMessage Claude bot reply loop.
 
-Receives a ParsedInbound from an inbound iMessage, calls Claude, and sends
-the reply via Sendblue. Single-turn for Slice 7; conversation memory is
-wired in Slice 8.
+Receives a ParsedInbound from an inbound iMessage, calls Claude with a
+rolling conversation context window, and sends the reply via Sendblue.
+Conversation turns are persisted in chat_messages (Supabase).
+
+Message ordering:
+  1. Persist user turn → always first, so we never lose a user message if
+     generation fails downstream.
+  2. Load history window → fetch recent turns (config: chat_history_limit).
+  3. Call Claude with full messages list (history + current user message).
+  4. Send reply via Sendblue.
+  5. Persist assistant turn.
+  6. Write action row for observability.
 
 Error policy: Claude API failures and Sendblue send failures are logged to
 health_logs and return None. The webhook always returns 202 — Sendblue will
-not retry and the user will not receive a duplicate message. Errors are
-observable, not silent.
+not retry and the user will not receive a duplicate message. DB failures on
+history append are logged but never crash the reply.
 """
 
 import asyncio
@@ -20,7 +29,9 @@ import anthropic
 from pydantic import BaseModel
 
 import db.actions as db_actions
+import db.chat_messages as db_chat
 import db.health_logs as db_health_logs
+from config import settings
 from connectors.base import ParsedInbound
 from connectors.sendblue_send import SendblueError, build_status_callback_url, send_message
 from db.schemas import ActionCreate, HealthLogCreate
@@ -51,7 +62,7 @@ class ChatResult(BaseModel):
 
 async def run(parsed: ParsedInbound) -> ChatResult | None:
     """
-    Call Claude with the inbound message and send the reply via Sendblue.
+    Persist user turn, call Claude with history, send reply, persist assistant turn.
     Returns ChatResult on success, None on any failure (errors are logged).
     Callers must guard: only call when parsed.body is non-empty.
     """
@@ -84,12 +95,23 @@ async def run(parsed: ParsedInbound) -> ChatResult | None:
 
 
 async def _reply(parsed: ParsedInbound, start: float) -> ChatResult:
-    # 1. Call Claude
+    phone = parsed.sender_phone
+
+    # 1. Persist user turn first — never lose a user message even if generation fails.
+    await _append_turn(phone, "user", parsed.body)
+
+    # 2. Load history window (includes the turn we just saved).
+    history = await asyncio.to_thread(
+        db_chat.get_recent, phone, settings.chat_history_limit
+    )
+    messages = [{"role": row["role"], "content": row["content"]} for row in history]
+
+    # 3. Call Claude with full context.
     response = await _anthropic.messages.create(
         model="claude-sonnet-4-6",
         max_tokens=1024,
         system=SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": parsed.body}],
+        messages=messages,
     )
 
     reply = response.content[0].text
@@ -100,33 +122,36 @@ async def _reply(parsed: ParsedInbound, start: float) -> ChatResult:
         + Decimal(token_output) * _COST_PER_OUTPUT_TOKEN
     )
 
-    # 2. Send reply via Sendblue
+    # 4. Send reply via Sendblue.
     await send_message(
-        to_number=parsed.sender_phone,
+        to_number=phone,
         content=reply,
         status_callback=build_status_callback_url(),
     )
 
+    # 5. Persist assistant turn.
+    await _append_turn(phone, "assistant", reply)
+
     duration_ms = _elapsed_ms(start)
 
-    # 3. Write action row for observability
+    # 6. Write action row for observability.
     await asyncio.to_thread(
         db_actions.create,
         ActionCreate(
             agent="chat",
             action_type="send_reply",
-            event_id=None,   # wired to event_id in Slice 8 when memory is added
+            event_id=None,
             token_input=token_input,
             token_output=token_output,
             usd_cost=usd_cost,
             duration_ms=duration_ms,
-            payload={"source_id": parsed.source_id, "sender_phone": parsed.sender_phone},
+            payload={"source_id": parsed.source_id, "sender_phone": phone},
         ),
     )
 
     logger.info(
-        "chat: reply sent to=%s tokens=%d+%d cost=$%.6f duration=%dms",
-        parsed.sender_phone, token_input, token_output, usd_cost, duration_ms,
+        "chat: reply sent to=%s turns_in_context=%d tokens=%d+%d cost=$%.6f duration=%dms",
+        phone, len(messages), token_input, token_output, usd_cost, duration_ms,
     )
 
     return ChatResult(
@@ -136,6 +161,19 @@ async def _reply(parsed: ParsedInbound, start: float) -> ChatResult:
         usd_cost=usd_cost,
         duration_ms=duration_ms,
     )
+
+
+async def _append_turn(phone: str, role: str, content: str) -> None:
+    """
+    Persist a conversation turn. DB failures are logged but never propagated —
+    a failed history write must not kill the reply loop.
+    """
+    try:
+        await asyncio.to_thread(db_chat.append, phone, role, content)
+    except Exception as exc:
+        logger.error(
+            "chat: failed to persist %s turn for %s: %s", role, phone, exc, exc_info=True
+        )
 
 
 def _elapsed_ms(start: float) -> int:
