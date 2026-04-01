@@ -10,7 +10,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 :root {
-  --bg: #08080f;
+  --bg: #050508;
   --surface: rgba(255,255,255,0.05);
   --surface-hover: rgba(255,255,255,0.09);
   --surface-deep: rgba(255,255,255,0.03);
@@ -45,14 +45,13 @@
 html,body{height:100%;overflow:hidden}
 
 body {
-  background: var(--bg);
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.03) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 80%, rgba(255,255,255,0.02) 0%, transparent 50%),
+    #050508;
   font-family: var(--font-sans);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
-  /* Radial background glow */
-  background-image:
-    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(79,110,247,0.07) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 80% 80%, rgba(0,255,136,0.04) 0%, transparent 55%);
 }
 
 /* ── GLASS MIXIN (applied via class) ── */
@@ -94,16 +93,27 @@ body {
   border-bottom: 1px solid var(--border);
   overflow: hidden;
   white-space: nowrap;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  flex-shrink: 0;
 }
+.sb-logo:hover { opacity: 0.72; }
 .sb-logo-text {
   font-family: var(--font-mono);
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.1em;
   color: var(--text-primary);
-  flex-shrink: 0;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+  overflow: hidden;
 }
-.sb-logo-text span { color: var(--accent); }
+.sb-logo-text .logo-full { display: inline; }
+.sb-logo-text .logo-short { display: none; color: var(--accent); }
+.sb-logo-text .logo-v { color: var(--accent); }
+#sidebar.collapsed .sb-logo-text .logo-full { display: none; }
+#sidebar.collapsed .sb-logo-text .logo-short { display: inline; }
+#sidebar.collapsed .sb-logo { justify-content: center; padding: 18px 0 14px; }
 .sb-badge {
   font-family: var(--font-mono);
   font-size: 9px;
@@ -115,9 +125,10 @@ body {
   padding: 2px 7px;
   border-radius: 20px;
   white-space: nowrap;
+  transition: opacity 0.2s, width 0.2s;
 }
 .sb-label { transition: opacity 0.2s; white-space: nowrap; overflow: hidden; }
-#sidebar.collapsed .sb-label { opacity: 0; pointer-events: none; }
+#sidebar.collapsed .sb-label { opacity: 0; pointer-events: none; width: 0; }
 #sidebar.collapsed .sb-badge { display: none; }
 #sidebar.collapsed .sb-user-info { display: none; }
 #sidebar.collapsed .sb-status-text { display: none; }
@@ -169,6 +180,13 @@ body {
 }
 .nav-badge.blue { background: var(--accent); color: #fff; }
 .nav-divider { border: none; border-top: 1px solid var(--border); margin: 8px 4px; }
+/* Collapsed nav item centering */
+#sidebar.collapsed .nav-item {
+  justify-content: center;
+  padding: 10px 0;
+  gap: 0;
+}
+#sidebar.collapsed .nav-badge { display: none; }
 
 .sb-footer {
   padding: 10px 8px 12px;
@@ -186,7 +204,13 @@ body {
   background: var(--surface-deep);
   border: 1px solid var(--border);
   overflow: hidden;
+  cursor: pointer;
+  transition: background 0.15s;
 }
+.sb-user:hover { background: var(--surface-hover); }
+/* Collapse user card */
+#sidebar.collapsed .sb-user { justify-content: center; padding: 8px; gap: 0; }
+#sidebar.collapsed .sb-status { justify-content: center; }
 .sb-avatar {
   width: 30px;
   height: 30px;
@@ -300,7 +324,7 @@ body {
   width: 14px;
   height: 14px;
 }
-.header-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.header-right { margin-left: auto; display: flex; align-items: center; gap: 12px; position: relative; }
 .icon-btn {
   width: 36px;
   height: 36px;
@@ -906,6 +930,128 @@ body {
   #sidebar { display: none; }
   .bento { grid-template-columns: 1fr; }
 }
+
+/* ── NOTIF COUNT BADGE ── */
+.notif-count-badge {
+  position: absolute;
+  top: 4px; right: 4px;
+  min-width: 16px; height: 16px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  line-height: 1;
+  box-shadow: 0 0 8px var(--accent-glow);
+  transition: opacity 0.2s;
+}
+.notif-count-badge.hidden { opacity: 0; pointer-events: none; }
+
+/* ── HEADER DROPDOWN PANEL ── */
+.hdr-dropdown {
+  position: absolute;
+  top: 44px;
+  background: rgba(10,10,16,0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.11);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.65);
+  z-index: 600;
+  overflow: hidden;
+  animation: ddropIn 0.15s ease;
+}
+@keyframes ddropIn {
+  from { opacity:0; transform:translateY(-6px) scale(0.98); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+.hdr-dropdown-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.hdr-dropdown-title {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--text-muted);
+}
+.mark-read-lnk {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--accent);
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.mark-read-lnk:hover { opacity: 0.7; }
+.notif-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  transition: background 0.15s;
+  cursor: default;
+}
+.notif-row:hover { background: rgba(255,255,255,0.04); }
+.notif-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.notif-body { flex: 1; min-width: 0; }
+.notif-title { font-size: 12px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+.notif-desc  { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.notif-time  { font-family: var(--font-mono); font-size: 10px; color: var(--text-dim); flex-shrink: 0; margin-top: 2px; }
+
+/* ── AVATAR DROPDOWN ── */
+.avatar-dropdown {
+  background: rgba(10,10,16,0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.11);
+  border-radius: 14px;
+  box-shadow: 0 16px 50px rgba(0,0,0,0.6);
+  z-index: 600;
+  overflow: hidden;
+  animation: ddropIn 0.15s ease;
+}
+.avatar-dd-user {
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.avatar-dd-name { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.avatar-dd-role { font-family: var(--font-mono); font-size: 10px; color: var(--accent); margin-top: 2px; }
+.avatar-dd-email { font-size: 11px; color: var(--text-dim); margin-top: 3px; }
+.avatar-dd-divider { height: 1px; background: rgba(255,255,255,0.07); }
+.avatar-dd-item {
+  padding: 11px 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.avatar-dd-item:hover { background: rgba(255,255,255,0.06); color: var(--text-primary); }
+.avatar-dd-signout { color: var(--red); }
+.avatar-dd-signout:hover { background: var(--red-dim); color: var(--red); }
+
+/* Sidebar avatar dropdown: positioned above and to the right */
+.sb-avatar-dropdown {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  width: 210px;
+}
 </style>
 </head>
 <body>
@@ -913,9 +1059,8 @@ body {
 
   <!-- ══ SIDEBAR ══ -->
   <nav id="sidebar" class="glass">
-    <div class="sb-logo">
-      <div class="sb-logo-text">GATSV<span>.</span>OS</div>
-      <div class="sb-badge sb-label">v1</div>
+    <div class="sb-logo" id="sb-logo-btn">
+      <div class="sb-logo-text"><span class="logo-full">GATSV OS <span class="logo-v">v1</span></span><span class="logo-short">GOS</span></div>
     </div>
 
     <div id="sb-collapse">
@@ -963,11 +1108,23 @@ body {
     </div>
 
     <div class="sb-footer">
-      <div class="sb-user">
+      <div class="sb-user" id="sb-user-btn" style="position:relative">
         <div class="sb-avatar">JG</div>
         <div class="sb-user-info sb-label">
-          <div class="sb-user-name">Jake</div>
+          <div class="sb-user-name">Jake Bickford</div>
           <div class="sb-user-role">Admin</div>
+        </div>
+        <!-- Avatar dropdown (sidebar) -->
+        <div id="avatar-dropdown-sidebar" class="sb-avatar-dropdown avatar-dropdown" style="display:none">
+          <div class="avatar-dd-user">
+            <div class="avatar-dd-name">Jake Bickford</div>
+            <div class="avatar-dd-role">Admin</div>
+            <div class="avatar-dd-email">jake@gatsv.com</div>
+          </div>
+          <div class="avatar-dd-divider"></div>
+          <div class="avatar-dd-item" onclick="navigateTo('settings')">Profile Settings</div>
+          <div class="avatar-dd-item" onclick="navigateTo('settings')">Billing</div>
+          <div class="avatar-dd-item avatar-dd-signout" onclick="if(confirm('Sign out of GATSV OS?'))alert('Signed out')">Sign Out</div>
         </div>
       </div>
       <div class="sb-status">
@@ -990,11 +1147,57 @@ body {
         <input type="text" placeholder="Search agents, tasks, logs…"/>
       </div>
       <div class="header-right">
-        <div class="icon-btn">
-          <div class="notif-badge"></div>
+        <!-- Bell -->
+        <div class="icon-btn" id="bell-btn" style="position:relative">
+          <span class="notif-count-badge" id="notif-count-badge">5</span>
           <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
         </div>
-        <div class="header-avatar">JG</div>
+        <!-- Notification dropdown -->
+        <div id="notif-dropdown" class="hdr-dropdown" style="display:none;right:54px;width:320px">
+          <div class="hdr-dropdown-head">
+            <span class="hdr-dropdown-title">NOTIFICATIONS</span>
+            <span class="mark-read-lnk" id="mark-read-btn">Mark all read</span>
+          </div>
+          <div class="notif-row">
+            <span class="notif-dot" style="background:var(--green);box-shadow:0 0 6px var(--green)"></span>
+            <div class="notif-body"><div class="notif-title">Approval Executed</div><div class="notif-desc">Marcus. proposal reply sent</div></div>
+            <span class="notif-time">4m</span>
+          </div>
+          <div class="notif-row">
+            <span class="notif-dot" style="background:var(--amber);box-shadow:0 0 6px var(--amber)"></span>
+            <div class="notif-body"><div class="notif-title">Low Confidence Route</div><div class="notif-desc">Event evt_4d88bc flagged for review</div></div>
+            <span class="notif-time">18m</span>
+          </div>
+          <div class="notif-row">
+            <span class="notif-dot" style="background:var(--green);box-shadow:0 0 6px var(--green)"></span>
+            <div class="notif-body"><div class="notif-title">New Inbound</div><div class="notif-desc">Tally form submission from Sarah K.</div></div>
+            <span class="notif-time">31m</span>
+          </div>
+          <div class="notif-row">
+            <span class="notif-dot" style="background:var(--red);box-shadow:0 0 6px var(--red)"></span>
+            <div class="notif-body"><div class="notif-title">Operator Error</div><div class="notif-desc">Email send failed — retrying</div></div>
+            <span class="notif-time">1h</span>
+          </div>
+          <div class="notif-row" style="border-bottom:none">
+            <span class="notif-dot" style="background:var(--green);box-shadow:0 0 6px var(--green)"></span>
+            <div class="notif-body"><div class="notif-title">Daily Digest Sent</div><div class="notif-desc">Morning summary delivered via Sendblue</div></div>
+            <span class="notif-time">7h</span>
+          </div>
+        </div>
+        <!-- Header avatar -->
+        <div class="header-avatar" id="header-avatar-btn" style="position:relative">JG</div>
+        <!-- Avatar dropdown (header) -->
+        <div id="avatar-dropdown-header" class="hdr-dropdown avatar-dropdown" style="display:none;right:0;width:210px">
+          <div class="avatar-dd-user">
+            <div class="avatar-dd-name">Jake Bickford</div>
+            <div class="avatar-dd-role">Admin</div>
+            <div class="avatar-dd-email">jake@gatsv.com</div>
+          </div>
+          <div class="avatar-dd-divider"></div>
+          <div class="avatar-dd-item" onclick="navigateTo('settings')">Profile Settings</div>
+          <div class="avatar-dd-item" onclick="navigateTo('settings')">Billing</div>
+          <div class="avatar-dd-item avatar-dd-signout" onclick="if(confirm('Sign out of GATSV OS?'))alert('Signed out')">Sign Out</div>
+        </div>
       </div>
     </header>
 
@@ -1275,24 +1478,77 @@ body {
 </style>
 
 <script>
-// ── SIDEBAR NAVIGATION ──
+// ── NAVIGATION ──
 const pageTitles = { overview:'Overview', agents:'Agents', inbox:'Inbox', workflows:'Workflows', approvals:'Approvals', logs:'Logs', settings:'Settings', help:'Help' };
+
+function navigateTo(pg) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelector(`.nav-item[data-page="${pg}"]`)?.classList.add('active');
+  document.getElementById('page-' + pg)?.classList.add('active');
+  document.getElementById('header-title').textContent = pageTitles[pg] || pg;
+  if (pg === 'logs') renderLogs();
+  closeAllDropdowns();
+}
+
 document.querySelectorAll('.nav-item[data-page]').forEach(item => {
-  item.addEventListener('click', () => {
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    item.classList.add('active');
-    const pg = item.dataset.page;
-    document.getElementById('page-' + pg)?.classList.add('active');
-    document.getElementById('header-title').textContent = pageTitles[pg] || pg;
-    if (pg === 'logs') renderLogs();
-  });
+  item.addEventListener('click', () => navigateTo(item.dataset.page));
 });
 
 // ── SIDEBAR COLLAPSE ──
 document.getElementById('collapse-btn').addEventListener('click', () => {
   document.getElementById('sidebar').classList.toggle('collapsed');
 });
+
+// ── LOGO CLICK → OVERVIEW ──
+document.getElementById('sb-logo-btn').addEventListener('click', () => navigateTo('overview'));
+
+// ── CLOSE ALL DROPDOWNS ──
+function closeAllDropdowns() {
+  document.getElementById('notif-dropdown').style.display = 'none';
+  document.getElementById('avatar-dropdown-header').style.display = 'none';
+  document.getElementById('avatar-dropdown-sidebar').style.display = 'none';
+}
+
+// ── NOTIFICATION BELL ──
+document.getElementById('bell-btn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  const dd = document.getElementById('notif-dropdown');
+  const isOpen = dd.style.display !== 'none';
+  closeAllDropdowns();
+  if (!isOpen) {
+    dd.style.display = 'block';
+    // Clear badge
+    document.getElementById('notif-count-badge').classList.add('hidden');
+  }
+});
+
+document.getElementById('mark-read-btn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  document.querySelectorAll('.notif-dot').forEach(d => { d.style.opacity = '0.3'; });
+  document.getElementById('notif-dropdown').style.display = 'none';
+});
+
+// ── AVATAR DROPDOWN (header) ──
+document.getElementById('header-avatar-btn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  const dd = document.getElementById('avatar-dropdown-header');
+  const isOpen = dd.style.display !== 'none';
+  closeAllDropdowns();
+  if (!isOpen) dd.style.display = 'block';
+});
+
+// ── AVATAR DROPDOWN (sidebar) ──
+document.getElementById('sb-user-btn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  const dd = document.getElementById('avatar-dropdown-sidebar');
+  const isOpen = dd.style.display !== 'none';
+  closeAllDropdowns();
+  if (!isOpen) dd.style.display = 'block';
+});
+
+// ── CLOSE ON OUTSIDE CLICK ──
+document.addEventListener('click', () => closeAllDropdowns());
 
 // ── LIVE CLOCK ──
 function updateClock() {
