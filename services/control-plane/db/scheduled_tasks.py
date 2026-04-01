@@ -44,6 +44,23 @@ def get_due(limit: int = 50) -> list[dict]:
     return result.data
 
 
+def list_pending(sender_phone: str) -> list[dict]:
+    """
+    Return all pending tasks for sender_phone ordered by scheduled_at ascending.
+    Includes past-due pending tasks (scheduler may have been down).
+    """
+    result = (
+        get_client()
+        .table("scheduled_tasks")
+        .select("id, content, scheduled_at")
+        .eq("sender_phone", sender_phone)
+        .eq("status", "pending")
+        .order("scheduled_at", desc=False)
+        .execute()
+    )
+    return result.data
+
+
 def mark_status(task_id: str, status: str) -> None:
     """Update the status of a single task. Used by the scheduler after firing."""
     get_client().table("scheduled_tasks").update({"status": status}).eq("id", task_id).execute()

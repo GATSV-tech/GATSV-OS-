@@ -54,7 +54,7 @@ def _mock_tool_use_response(
     """Simulate a tool_use response from Claude."""
     if tool_input is None:
         tool_input = {
-            "scheduled_at": "2026-04-01T22:00:00Z",
+            "scheduled_at": "2026-04-01T15:00:00",
             "reminder_text": "call Marcus",
         }
     tool_block = MagicMock()
@@ -272,7 +272,7 @@ async def test_reminder_intent_creates_task_and_sends_ack(
     - ChatResult is returned with the ack as reply
     """
     mock_claude = AsyncMock(return_value=_mock_tool_use_response(
-        tool_input={"scheduled_at": "2026-04-01T22:00:00Z", "reminder_text": "call Marcus"}
+        tool_input={"scheduled_at": "2026-04-01T15:00:00", "reminder_text": "call Marcus"}
     ))
 
     with patch("agents.chat._anthropic") as mock_client:
@@ -296,7 +296,7 @@ async def test_tool_use_ack_saved_as_assistant_turn(
 ):
     """Ack text from tool handler is persisted as the assistant turn in history."""
     mock_claude = AsyncMock(return_value=_mock_tool_use_response(
-        tool_input={"scheduled_at": "2026-04-01T22:00:00Z", "reminder_text": "call Marcus"}
+        tool_input={"scheduled_at": "2026-04-01T15:00:00", "reminder_text": "call Marcus"}
     ))
 
     with (

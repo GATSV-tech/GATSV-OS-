@@ -27,7 +27,7 @@ async def _handle(tool_input: dict, ctx: ToolContext) -> ToolResult:
     if scheduled_at.tzinfo is None:
         scheduled_at = scheduled_at.replace(tzinfo=_PACIFIC).astimezone(timezone.utc)
     else:
-        heduled_at = scheduled_at.astimezone(timezone.utc)
+        scheduled_at = scheduled_at.astimezone(timezone.utc)
 
     await asyncio.to_thread(
         db_tasks.create,
@@ -59,7 +59,7 @@ register(
             "Pass the time in Pacific time exactly as the user stated it."
         ),
         input_schema={
-            "type": "ject",
+            "type": "object",
             "properties": {
                 "scheduled_at": {
                     "type": "string",

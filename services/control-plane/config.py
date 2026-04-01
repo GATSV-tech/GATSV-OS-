@@ -55,6 +55,13 @@ class Settings(BaseSettings):
     # How often (in seconds) the scheduler polls Supabase for due tasks.
     scheduler_poll_interval_seconds: int = 60
 
+    # Daily digest — proactive morning summary (Slice 10+)
+    # Jake's phone number — required for all proactive outbound sends.
+    jake_phone_number: Optional[str] = None
+    # Default send time in Pacific time (HH:MM, 24h). Overridable per-user via
+    # the daily_brief tool, which stores the preference in Supabase user_prefs.
+    digest_send_time_pt: str = "07:00"
+
 
 # Single shared instance — import this everywhere, never instantiate Settings again
 settings = Settings()

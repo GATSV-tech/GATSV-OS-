@@ -5,7 +5,8 @@ from fastapi import FastAPI
 
 from config import settings
 from routers import health, webhooks
-from scheduler import runner as scheduler
+from scheduler import runner as task_scheduler
+from scheduler import digest as digest_scheduler
 
 logging.basicConfig(
     level=getattr(logging, settings.log_level.upper(), logging.INFO),
@@ -20,9 +21,20 @@ async def lifespan(app: FastAPI):
         "GATSV OS Control Plane starting",
         extra={"env": settings.app_env, "version": settings.app_version},
     )
-    scheduler.start()
+    task_scheduler.start()
+
+    if settings.jake_phone_number:
+        digest_scheduler.start(settings.jake_phone_number)
+    else:
+        logger.warning(
+            "JAKE_PHONE_NUMBER is not set — daily digest will not run. "
+            "Set this in .env to enable proactive sends."
+        )
+
     yield
-    scheduler.stop()
+
+    task_scheduler.stop()
+    digest_scheduler.stop()
     logger.info("GATSV OS Control Plane shutting down")
 
 

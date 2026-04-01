@@ -70,8 +70,7 @@ def _build_system_prompt() -> str:
         f"Current time: {time_str}. "
         "Be direct and concise. "
         "Respond in plain text — no markdown, no bullet points unless asked. "
-        "When the user asks to be reminded about something at a specific time, "
-        "use the set_reminder tool. Convert times to UTC before calling the tool."
+        "Use the available tools when the user's request matches a tool's purpose."
     )
 
 
