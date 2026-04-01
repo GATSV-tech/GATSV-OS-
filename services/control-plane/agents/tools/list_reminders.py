@@ -45,8 +45,10 @@ register(
     ToolDefinition(
         name="list_reminders",
         description=(
-            "List all of the user's pending reminders. Use this when the user asks "
-            "what reminders they have, e.g. 'what reminders do I have', 'show my reminders'."
+            "List the user's pending reminders. "
+            "Use ONLY when the user asks to see their reminders: "
+            "'what reminders do I have', 'show my reminders', 'list my reminders'. "
+            "Do NOT use for notes, digest settings, or cancelling a reminder."
         ),
         input_schema={
             "type": "object",

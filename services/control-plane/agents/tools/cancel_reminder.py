@@ -61,8 +61,9 @@ register(
         name="cancel_reminder",
         description=(
             "Cancel a pending reminder by matching its content or scheduled time. "
-            "Use this when the user says 'cancel my X reminder' or 'remove the Y reminder'. "
-            "Pass the keyword or time they mentioned as the query."
+            "Use ONLY when the user explicitly asks to cancel or remove a specific reminder: "
+            "'cancel my 4pm reminder', 'remove the call Marcus reminder'. "
+            "Do NOT use for: listing reminders, deleting notes, or changing digest time."
         ),
         input_schema={
             "type": "object",

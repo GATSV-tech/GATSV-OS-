@@ -2,19 +2,17 @@
 Scheduler — proactive outbound task runner.
 
 Polls the scheduled_tasks table every N seconds (config: scheduler_poll_interval_seconds)
-for pending tasks whose scheduled_at is in the past, fires them via Sendblue, and marks
-each task sent or failed.
+for pending tasks whose scheduled_at is in the past, fires them via Sendblue.
 
-Lifecycle: start() is called from the FastAPI lifespan on startup; stop() is called on
-shutdown. Both are synchronous — the asyncio task is created and cancelled internally.
+Duplicate-send prevention: each task is marked 'sent' BEFORE the Sendblue call.
+This means a process crash between mark and send produces a missed send (acceptable)
+rather than a duplicate send (not acceptable). If the Sendblue call fails after
+the optimistic mark, the task is marked 'failed' and will not retry automatically.
 
 Error handling:
-- Sendblue failure on a single task → mark failed, log to health_logs, continue to
-  next task. One bad task never blocks the rest.
+- DB failure on claim → log and skip; task stays pending, retried next tick.
+- Sendblue failure after claim → mark failed, log to health_logs, continue to next task.
 - Unexpected error in _tick() → logged, scheduler keeps running.
-- DB failure in mark_status → logged; the task remains pending and will be retried
-  on the next tick. This is safe — Sendblue will send a duplicate if the message
-  went out but the mark failed. Acceptable for v1 at low volume.
 """
 
 import asyncio
@@ -44,26 +42,37 @@ async def _tick() -> None:
         phone = row["sender_phone"]
         content = row["content"]
 
+        # ── Step 1: Claim the task before sending ─────────────────────────
+        # Marking 'sent' first prevents re-fire if the process crashes between
+        # send and mark. Trade-off: a crash after mark but before send = missed
+        # send, not a duplicate. Missed sends are safer than duplicate sends.
+        try:
+            await asyncio.to_thread(db_tasks.mark_status, task_id, "sent")
+        except Exception as exc:
+            logger.error(
+                "scheduler: could not claim task %s — skipping this tick: %s",
+                task_id, exc, exc_info=True,
+            )
+            continue  # Task stays pending; retried on the next tick.
+
+        # ── Step 2: Send ──────────────────────────────────────────────────
         try:
             await send_message(
                 to_number=phone,
                 content=content,
                 status_callback=build_status_callback_url(),
             )
-            await asyncio.to_thread(db_tasks.mark_status, task_id, "sent")
             logger.info("scheduler: task %s sent to %s", task_id, phone)
 
         except Exception as exc:
             logger.error(
-                "scheduler: task %s failed for %s: %s", task_id, phone, exc, exc_info=True
+                "scheduler: task %s send failed for %s: %s", task_id, phone, exc, exc_info=True
             )
             try:
                 await asyncio.to_thread(db_tasks.mark_status, task_id, "failed")
             except Exception:
                 logger.error(
-                    "scheduler: could not mark task %s failed — will retry next tick",
-                    task_id,
-                    exc_info=True,
+                    "scheduler: could not mark task %s failed", task_id, exc_info=True
                 )
             try:
                 await asyncio.to_thread(

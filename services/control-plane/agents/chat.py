@@ -59,15 +59,22 @@ _COST_PER_OUTPUT_TOKEN = Decimal("15") / Decimal("1000000")  # $15 / 1M tokens
 
 def _build_system_prompt() -> str:
     """
-    Build the system prompt with the current Pacific time injected.
-    Called at the start of each request so relative times ("at 3pm", "in 2 hours")
-    are interpreted correctly.
+    Build the system prompt with the current Pacific date and time injected.
+    Called at the start of each request so relative times ("at 3pm", "in 2 hours",
+    "tomorrow morning") can be resolved to exact datetimes by Claude.
     """
     now_pt = datetime.now(_PACIFIC)
-    time_str = now_pt.strftime("%A, %B %-d, %Y at %-I:%M %p PT")
+    # Build a cross-platform, unambiguous date/time string for Claude.
+    hour_12 = now_pt.hour % 12 or 12
+    minute = now_pt.strftime("%M")
+    ampm = "AM" if now_pt.hour < 12 else "PM"
+    date_str = (
+        f"{now_pt.strftime('%A, %B')} {now_pt.day}, {now_pt.year} "
+        f"at {hour_12}:{minute} {ampm} PT"
+    )
     return (
         f"You are Jake's personal assistant, reachable via iMessage. "
-        f"Current time: {time_str}. "
+        f"Current date and time: {date_str}. "
         "Be direct and concise. "
         "Respond in plain text — no markdown, no bullet points unless asked. "
         "Use the available tools when the user's request matches a tool's purpose."

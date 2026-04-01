@@ -24,9 +24,11 @@ register(
     ToolDefinition(
         name="create_note",
         description=(
-            "Save a freeform note for later. Use this when the user says something like "
-            "'remember that...', 'note: ...', or 'save this: ...'. "
-            "Extract the note content from their message."
+            "Save a freeform note for the user. "
+            "Use ONLY when the user is saving information with no time component: "
+            "'note: ...', 'remember that...', 'save this:', 'write this down', 'keep track of'. "
+            "Do NOT use for: timed reminders ('remind me at X to...') "
+            "or digest/schedule changes ('send me the brief at X', 'change digest time')."
         ),
         input_schema={
             "type": "object",

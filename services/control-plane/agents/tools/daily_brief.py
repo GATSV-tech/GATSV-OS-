@@ -53,9 +53,12 @@ register(
     ToolDefinition(
         name="daily_brief",
         description=(
-            "Set or change the time the daily digest is sent. Use this when the user says "
-            "something like 'send me the daily brief at 8am' or 'change my digest to 7:30'. "
-            "Convert the requested time to 24-hour HH:MM format before calling."
+            "Set or change the time the daily digest/brief/summary is sent. "
+            "Use ONLY when the user mentions changing when their daily digest, daily brief, "
+            "or morning summary fires: 'send me the daily brief at 8am', "
+            "'change my digest to 7:30', 'update my morning summary time'. "
+            "The trigger phrase must reference the digest/brief/summary — not a one-off task reminder. "
+            "Do NOT use for: setting task reminders ('remind me to...') or saving notes."
         ),
         input_schema={
             "type": "object",

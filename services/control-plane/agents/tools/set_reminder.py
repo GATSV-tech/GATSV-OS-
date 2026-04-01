@@ -54,9 +54,12 @@ register(
     ToolDefinition(
         name="set_reminder",
         description=(
-            "Schedule a reminder message to be sent to the user at a specific time. "
-            "Use this when the user asks to be reminded about something at a specific time. "
-            "Pass the time in Pacific time exactly as the user stated it."
+            "Schedule a future reminder for the user. "
+            "Use ONLY when the user explicitly says 'remind me at [time] to [do X]' "
+            "or 'set a reminder for [time] to [do X]'. "
+            "Both a specific future time AND a task to be reminded about must be present. "
+            "Do NOT use for: saving notes or information ('note:', 'remember that', 'save this'), "
+            "or changing the daily digest schedule ('daily brief', 'digest', 'morning summary')."
         ),
         input_schema={
             "type": "object",
@@ -64,9 +67,14 @@ register(
                 "scheduled_at": {
                     "type": "string",
                     "description": (
-                        "The Pacific time datetime to send the reminder, in ISO 8601 format "
-                        "(e.g. '2026-04-01T15:00:00'). Pass the time exactly as the user "
-                        "stated it in Pacific time — do NOT convert to UTC."
+                        "The full ISO 8601 datetime in Pacific time when the reminder should fire "
+                        "(e.g. '2026-04-01T15:00:00'). Always include the complete date. "
+                        "To determine the correct date: if the requested time is still in the "
+                        "future today, use today's date. If the requested time has already passed "
+                        "today, use tomorrow's date. "
+                        "Example: if it is currently 5:19 AM on April 1 and the user says "
+                        "'at 7am', pass '2026-04-01T07:00:00'. If the user says 'at 3am', "
+                        "pass '2026-04-02T03:00:00' because 3am has already passed today."
                     ),
                 },
                 "reminder_text": {
