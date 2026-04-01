@@ -1,0 +1,44 @@
+# systemd unit for GATSV OS Control Plane (via Docker Compose)
+# Place at: /etc/systemd/system/gatsv-os.service
+#
+# After placing:
+#   systemctl daemon-reload
+#   systemctl enable gatsv-os
+#   systemctl start gatsv-os
+
+[Unit]
+Description=GATSV OS Control Plane
+Documentation=https://github.com/gatsv/gatsv-os
+After=docker.service network-online.target
+Requires=docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+
+WorkingDirectory=/opt/gatsv-os
+
+# Start: build if needed, then bring up detached
+ExecStart=/usr/bin/docker compose -f docker-compose.prod.yml up -d --build
+
+# Stop: graceful shutdown, 30s timeout before kill
+ExecStop=/usr/bin/docker compose -f docker-compose.prod.yml down --timeout 30
+
+# Reload (used by deploy script): pull + rebuild + restart
+ExecReload=/bin/bash -c '\
+  cd /opt/gatsv-os && \
+  git pull --ff-only && \
+  docker compose -f docker-compose.prod.yml build && \
+  docker compose -f docker-compose.prod.yml up -d'
+
+# Give Docker time to pull images and start containers on first boot
+TimeoutStartSec=120
+TimeoutStopSec=60
+
+# Restart policy: if the service stops unexpectedly, wait 10s and retry
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

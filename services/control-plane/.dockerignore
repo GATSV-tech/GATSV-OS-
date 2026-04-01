@@ -1,0 +1,33 @@
+# Never bake secrets into the image
+.env
+.env.*
+
+# Python runtime artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# Virtual environment — deps are installed during build
+.venv/
+venv/
+env/
+
+# Tests — not needed in the production image
+tests/
+
+# Dev tools
+.git/
+.gitignore
+pytest.ini
+
+# Ruflo internal state
+.claude-flow/
+
+# Editor
+.vscode/
+.idea/
+*.swp
