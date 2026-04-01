@@ -390,7 +390,8 @@ body {
     "sys   sys   req   appr"
     "sys   sys   comp  resp"
     "chart chart feed  feed"
-    "ops   ops   queue queue";
+    "ops   ops   queue queue"
+    "blank blank blank blank";
 }
 
 /* ── WIDGET BASE ── */
@@ -922,7 +923,8 @@ body {
       "chart chart"
       "feed  feed"
       "ops   ops"
-      "queue queue";
+      "queue queue"
+      "blank blank";
   }
 }
 @media (max-width: 768px) {
@@ -1208,7 +1210,7 @@ body {
         <div class="bento">
 
           <!-- [2x2] System Overview -->
-          <div class="widget glass w-sys">
+          <div class="widget glass w-sys" data-expand-id="sys" data-expand-title="System Overview">
             <div class="widget-label">
               <span>GATSV OS</span>
             </div>
@@ -1224,14 +1226,14 @@ body {
           </div>
 
           <!-- [1x1] Requests Today -->
-          <div class="widget glass w-req">
+          <div class="widget glass w-req" data-expand-id="req" data-expand-title="Requests Today">
             <div class="kpi-lbl">Requests Today</div>
             <div class="kpi-num" id="kpi-req">47</div>
             <div class="kpi-trend">↑ 12% vs yesterday</div>
           </div>
 
           <!-- [1x1] Pending Approvals -->
-          <div class="widget glass w-appr" style="position:relative">
+          <div class="widget glass w-appr" style="position:relative" data-expand-id="appr" data-expand-title="Pending Approvals">
             <div class="appr-dot"></div>
             <div class="kpi-lbl">Need Review</div>
             <div class="kpi-num" id="kpi-appr" style="color:var(--amber)">7</div>
@@ -1239,27 +1241,27 @@ body {
           </div>
 
           <!-- [1x1] Completed -->
-          <div class="widget glass w-comp">
+          <div class="widget glass w-comp" data-expand-id="comp" data-expand-title="Completed">
             <div class="kpi-lbl">Completed</div>
             <div class="kpi-num" style="color:var(--green)">38</div>
             <div class="kpi-trend">↑ 8% vs yesterday</div>
           </div>
 
           <!-- [1x1] Avg Response -->
-          <div class="widget glass w-resp">
+          <div class="widget glass w-resp" data-expand-id="resp" data-expand-title="Avg Response Time">
             <div class="kpi-lbl">Avg Response</div>
             <div class="kpi-num">2.4<span style="font-size:18px;font-weight:400;color:var(--text-muted)">m</span></div>
             <div class="kpi-trend down">↓ −0.3m vs yesterday</div>
           </div>
 
           <!-- [2x1] Chart -->
-          <div class="widget glass w-chart">
+          <div class="widget glass w-chart" data-expand-id="chart" data-expand-title="Request Volume">
             <div class="widget-label">Request Volume — Last 7 Days</div>
             <div class="chart-canvas-wrap"><canvas id="volumeChart"></canvas></div>
           </div>
 
           <!-- [2x2] Activity Feed -->
-          <div class="widget glass w-feed">
+          <div class="widget glass w-feed" data-expand-id="feed" data-expand-title="Live Activity">
             <div class="feed-header">
               <div class="widget-label" style="margin-bottom:0">
                 <div class="live-dot"></div>
@@ -1270,7 +1272,7 @@ body {
           </div>
 
           <!-- [1x2] Approval Queue -->
-          <div class="widget glass w-queue">
+          <div class="widget glass w-queue" data-expand-id="queue" data-expand-title="Approval Queue">
             <div class="widget-label" style="justify-content:space-between">
               <span>APPROVALS</span>
               <span class="queue-count" id="queue-count">7 pending</span>
@@ -1312,12 +1314,14 @@ body {
             </div>
           </div>
 
-          <!-- [1x1] Gatekeeper Status -->
-          <div class="widget glass w-ops" style="grid-area:unset">
+          <!-- Blank / Customize tile -->
+          <div class="widget w-blank" id="blank-widget">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            <span>CUSTOMIZE WIDGETS</span>
           </div>
 
           <!-- [2x1] Active Operators -->
-          <div class="widget glass w-ops">
+          <div class="widget glass w-ops" data-expand-id="ops" data-expand-title="Active Operators">
             <div class="widget-label">Active Operators</div>
             <div class="op-row">
               <div class="status-dot-sm green"></div>
@@ -1454,12 +1458,337 @@ body {
         </div>
       </div>
 
-      <!-- STUB PAGES -->
-      <div class="page" id="page-inbox"><div class="page-head"><h2>Inbox</h2><span class="page-head-badge">3 new</span></div><div class="widget glass"><p class="stub-msg">Inbox view — coming in next slice</p></div></div>
-      <div class="page" id="page-workflows"><div class="page-head"><h2>Workflows</h2></div><div class="widget glass"><p class="stub-msg">Workflow builder — coming in next slice</p></div></div>
-      <div class="page" id="page-approvals"><div class="page-head"><h2>Approvals</h2><span class="page-head-badge" style="color:var(--amber);border-color:rgba(255,215,0,0.25);background:var(--amber-dim)">7 pending</span></div><div class="widget glass"><p class="stub-msg">Full approvals list — coming in next slice</p></div></div>
-      <div class="page" id="page-settings"><div class="page-head"><h2>Settings</h2></div><div class="widget glass"><p class="stub-msg">Settings panel — coming in next slice</p></div></div>
-      <div class="page" id="page-help"><div class="page-head"><h2>Help</h2></div><div class="widget glass"><p class="stub-msg">Documentation — coming in next slice</p></div></div>
+      <!-- ══ INBOX PAGE ══ -->
+      <div class="page" id="page-inbox">
+        <div class="page-head"><h2>Inbox</h2><span class="page-head-badge">3 new</span></div>
+        <div class="inbox-wrap">
+          <div class="inbox-list" id="inbox-list">
+            <div class="inbox-item unread" data-idx="0" onclick="selectInbox(0)">
+              <div class="inbox-icon-wrap email"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg></div>
+              <div class="inbox-item-body">
+                <div class="inbox-item-row1"><span class="inbox-from">Marcus T.</span><span class="inbox-time">4m</span></div>
+                <div class="inbox-preview">Re: Q2 Proposal — wanted to follow up on the pricing discussion…</div>
+                <span class="ibadge new">New</span>
+              </div>
+            </div>
+            <div class="inbox-item unread" data-idx="1" onclick="selectInbox(1)">
+              <div class="inbox-icon-wrap email"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg></div>
+              <div class="inbox-item-body">
+                <div class="inbox-item-row1"><span class="inbox-from">Sarah K.</span><span class="inbox-time">18m</span></div>
+                <div class="inbox-preview">Form submission: Interested in services for my small agency…</div>
+                <span class="ibadge routed">Routed</span>
+              </div>
+            </div>
+            <div class="inbox-item" data-idx="2" onclick="selectInbox(2)">
+              <div class="inbox-icon-wrap sms"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 8.25h3m-3 3h3m-3 3h3"/></svg></div>
+              <div class="inbox-item-body">
+                <div class="inbox-item-row1"><span class="inbox-from">Daniel R.</span><span class="inbox-time">31m</span></div>
+                <div class="inbox-preview">Hey, just checking in on the support request I submitted…</div>
+                <span class="ibadge approved">Approved</span>
+              </div>
+            </div>
+            <div class="inbox-item" data-idx="3" onclick="selectInbox(3)">
+              <div class="inbox-icon-wrap slack"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg></div>
+              <div class="inbox-item-body">
+                <div class="inbox-item-row1"><span class="inbox-from">#ops-channel</span><span class="inbox-time">1h</span></div>
+                <div class="inbox-preview">Error alert: Email send failed after 3 retries — operator stalled</div>
+                <span class="ibadge done">Done</span>
+              </div>
+            </div>
+            <div class="inbox-item unread" data-idx="4" onclick="selectInbox(4)">
+              <div class="inbox-icon-wrap email"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg></div>
+              <div class="inbox-item-body">
+                <div class="inbox-item-row1"><span class="inbox-from">Jennifer L.</span><span class="inbox-time">2h</span></div>
+                <div class="inbox-preview">Partnership inquiry — I've been following your work for a while…</div>
+                <span class="ibadge new">New</span>
+              </div>
+            </div>
+            <div class="inbox-item" data-idx="5" onclick="selectInbox(5)">
+              <div class="inbox-icon-wrap email"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg></div>
+              <div class="inbox-item-body">
+                <div class="inbox-item-row1"><span class="inbox-from">Thomas B.</span><span class="inbox-time">3h</span></div>
+                <div class="inbox-preview">Support: Integration not responding after recent update…</div>
+                <span class="ibadge routed">Routed</span>
+              </div>
+            </div>
+            <div class="inbox-item" data-idx="6" onclick="selectInbox(6)">
+              <div class="inbox-icon-wrap sms"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 8.25h3m-3 3h3m-3 3h3"/></svg></div>
+              <div class="inbox-item-body">
+                <div class="inbox-item-row1"><span class="inbox-from">+1 702 555 4821</span><span class="inbox-time">5h</span></div>
+                <div class="inbox-preview">Quick question about the pricing tiers — do you offer monthly…</div>
+                <span class="ibadge done">Done</span>
+              </div>
+            </div>
+            <div class="inbox-item" data-idx="7" onclick="selectInbox(7)">
+              <div class="inbox-icon-wrap email"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg></div>
+              <div class="inbox-item-body">
+                <div class="inbox-item-row1"><span class="inbox-from">Chris M.</span><span class="inbox-time">7h</span></div>
+                <div class="inbox-preview">Following up from last week's discovery call — had a few more…</div>
+                <span class="ibadge done">Done</span>
+              </div>
+            </div>
+          </div>
+          <div class="inbox-detail glass" id="inbox-detail">
+            <div class="inbox-empty-state">
+              <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="color:var(--text-dim)"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 13.5h3.86a2.25 2.25 0 012.012 1.244l.256.512a2.25 2.25 0 002.013 1.244h3.218a2.25 2.25 0 002.013-1.244l.256-.512a2.25 2.25 0 012.013-1.244h3.859m-19.5.338V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 00-2.15-1.588H6.911a2.25 2.25 0 00-2.15 1.588L2.35 13.177a2.25 2.25 0 00-.1.661z"/></svg>
+              <p>Select an item to view</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ WORKFLOWS PAGE ══ -->
+      <div class="page" id="page-workflows">
+        <div class="page-head" style="justify-content:space-between;margin-bottom:var(--gap)">
+          <div style="display:flex;align-items:center;gap:12px"><h2>Workflows</h2><span class="page-head-badge">3 active</span></div>
+          <button class="pbtn-primary" onclick="showToast('Workflow builder coming soon')">+ NEW WORKFLOW</button>
+        </div>
+        <div class="wf-grid">
+          <div class="wf-card glass">
+            <div class="wf-card-head"><span class="wf-name">Lead Intake Pipeline</span><span class="wf-badge active">Active</span></div>
+            <div class="wf-meta"><span class="wf-meta-k">Trigger</span> Tally Form Submission</div>
+            <div class="wf-meta"><span class="wf-meta-k">Steps</span> 4 steps</div>
+            <div class="wf-meta"><span class="wf-meta-k">Last run</span> 2h ago</div>
+            <div class="wf-stats"><div><div class="wf-stat-v">12</div><div class="wf-stat-l">Runs today</div></div><div><div class="wf-stat-v" style="color:var(--green)">98%</div><div class="wf-stat-l">Success</div></div></div>
+            <div class="wf-btns"><button class="pbtn-ghost">VIEW</button><button class="pbtn-amber">PAUSE</button></div>
+          </div>
+          <div class="wf-card glass">
+            <div class="wf-card-head"><span class="wf-name">Email Acknowledgment</span><span class="wf-badge active">Active</span></div>
+            <div class="wf-meta"><span class="wf-meta-k">Trigger</span> Inbound Email</div>
+            <div class="wf-meta"><span class="wf-meta-k">Steps</span> 3 steps</div>
+            <div class="wf-meta"><span class="wf-meta-k">Last run</span> 41m ago</div>
+            <div class="wf-stats"><div><div class="wf-stat-v">8</div><div class="wf-stat-l">Runs today</div></div><div><div class="wf-stat-v" style="color:var(--green)">95%</div><div class="wf-stat-l">Success</div></div></div>
+            <div class="wf-btns"><button class="pbtn-ghost">VIEW</button><button class="pbtn-amber">PAUSE</button></div>
+          </div>
+          <div class="wf-card glass" style="opacity:0.7">
+            <div class="wf-card-head"><span class="wf-name">Support Triage</span><span class="wf-badge paused">Paused</span></div>
+            <div class="wf-meta"><span class="wf-meta-k">Trigger</span> Inbound Email</div>
+            <div class="wf-meta"><span class="wf-meta-k">Steps</span> 5 steps</div>
+            <div class="wf-meta"><span class="wf-meta-k">Last run</span> 3h ago</div>
+            <div class="wf-stats"><div><div class="wf-stat-v" style="color:var(--text-dim)">0</div><div class="wf-stat-l">Runs today</div></div><div><div class="wf-stat-v" style="color:var(--green)">100%</div><div class="wf-stat-l">Success</div></div></div>
+            <div class="wf-btns"><button class="pbtn-ghost">VIEW</button><button class="pbtn-green">RESUME</button></div>
+          </div>
+          <div class="wf-card glass">
+            <div class="wf-card-head"><span class="wf-name">Daily Digest</span><span class="wf-badge active">Active</span></div>
+            <div class="wf-meta"><span class="wf-meta-k">Trigger</span> Scheduled · 07:00 PT</div>
+            <div class="wf-meta"><span class="wf-meta-k">Steps</span> 2 steps</div>
+            <div class="wf-meta"><span class="wf-meta-k">Last run</span> 7h ago</div>
+            <div class="wf-stats"><div><div class="wf-stat-v">1</div><div class="wf-stat-l">Runs today</div></div><div><div class="wf-stat-v" style="color:var(--green)">100%</div><div class="wf-stat-l">Success</div></div></div>
+            <div class="wf-btns"><button class="pbtn-ghost">VIEW</button><button class="pbtn-amber">PAUSE</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ APPROVALS PAGE ══ -->
+      <div class="page" id="page-approvals">
+        <div class="page-head"><h2>Approvals</h2><span class="page-head-badge" style="color:var(--amber);background:var(--amber-dim);border-color:rgba(255,215,0,0.25)" id="appr-page-badge">7 pending</span></div>
+        <div class="appr-section-lbl">PENDING</div>
+        <div class="appr-page-grid" id="appr-page-grid">
+          <div class="appr-page-card glass" data-id="p0">
+            <div class="apc-top"><div style="display:flex;gap:10px;align-items:center"><div class="apc-ch-icon email"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg></div><div><div class="apc-name">Marcus T.</div><div class="apc-sub">Email Operator · 4m pending</div></div></div><span class="risk high">HIGH</span></div>
+            <div class="apc-summary">Send follow-up re: Q2 proposal — includes $8,400 pricing for enterprise package.</div>
+            <div class="apc-reason">Reason: Contains pricing commitments</div>
+            <div class="apc-btns"><button class="btn-appr" onclick="handleApprPage(this)">APPROVE</button><button class="btn-rej" onclick="handleApprPage(this)">REJECT</button><button class="pbtn-ghost" onclick="handleApprPage(this)">DEFER</button></div>
+          </div>
+          <div class="appr-page-card glass" data-id="p1">
+            <div class="apc-top"><div style="display:flex;gap:10px;align-items:center"><div class="apc-ch-icon form"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"/></svg></div><div><div class="apc-name">Sarah K.</div><div class="apc-sub">Email Operator · 18m pending</div></div></div><span class="risk medium">MED</span></div>
+            <div class="apc-summary">Create entity record and send onboarding acknowledgment to new Tally lead.</div>
+            <div class="apc-reason">Reason: First-time contact — no prior entity record</div>
+            <div class="apc-btns"><button class="btn-appr" onclick="handleApprPage(this)">APPROVE</button><button class="btn-rej" onclick="handleApprPage(this)">REJECT</button><button class="pbtn-ghost" onclick="handleApprPage(this)">DEFER</button></div>
+          </div>
+          <div class="appr-page-card glass" data-id="p2">
+            <div class="apc-top"><div style="display:flex;gap:10px;align-items:center"><div class="apc-ch-icon email"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg></div><div><div class="apc-name">Daniel R.</div><div class="apc-sub">Email Operator · 41m pending</div></div></div><span class="risk medium">MED</span></div>
+            <div class="apc-summary">Route support request and send automated SLA response with estimated resolution timeline.</div>
+            <div class="apc-reason">Reason: SLA commitment in message body</div>
+            <div class="apc-btns"><button class="btn-appr" onclick="handleApprPage(this)">APPROVE</button><button class="btn-rej" onclick="handleApprPage(this)">REJECT</button><button class="pbtn-ghost" onclick="handleApprPage(this)">DEFER</button></div>
+          </div>
+          <div class="appr-page-card glass" data-id="p3">
+            <div class="apc-top"><div style="display:flex;gap:10px;align-items:center"><div class="apc-ch-icon email"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg></div><div><div class="apc-name">Jennifer L.</div><div class="apc-sub">Email Operator · 2h pending</div></div></div><span class="risk low">LOW</span></div>
+            <div class="apc-summary">Send partnership proposal template and scheduling link for discovery call.</div>
+            <div class="apc-reason">Reason: Outbound with external calendar link</div>
+            <div class="apc-btns"><button class="btn-appr" onclick="handleApprPage(this)">APPROVE</button><button class="btn-rej" onclick="handleApprPage(this)">REJECT</button><button class="pbtn-ghost" onclick="handleApprPage(this)">DEFER</button></div>
+          </div>
+          <div class="appr-page-card glass" data-id="p4">
+            <div class="apc-top"><div style="display:flex;gap:10px;align-items:center"><div class="apc-ch-icon email"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg></div><div><div class="apc-name">Thomas B.</div><div class="apc-sub">Slack Operator · 3h pending</div></div></div><span class="risk low">LOW</span></div>
+            <div class="apc-summary">Create support ticket and send acknowledgment with ticket number and ETA.</div>
+            <div class="apc-reason">Reason: Cross-system action (Supabase + Email)</div>
+            <div class="apc-btns"><button class="btn-appr" onclick="handleApprPage(this)">APPROVE</button><button class="btn-rej" onclick="handleApprPage(this)">REJECT</button><button class="pbtn-ghost" onclick="handleApprPage(this)">DEFER</button></div>
+          </div>
+          <div class="appr-page-card glass" data-id="p5">
+            <div class="apc-top"><div style="display:flex;gap:10px;align-items:center"><div class="apc-ch-icon slack"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg></div><div><div class="apc-name">#ops-channel</div><div class="apc-sub">Slack Operator · 4h pending</div></div></div><span class="risk low">LOW</span></div>
+            <div class="apc-summary">Post daily event summary to #ops-channel with 24h stats and open approval count.</div>
+            <div class="apc-reason">Reason: External channel post</div>
+            <div class="apc-btns"><button class="btn-appr" onclick="handleApprPage(this)">APPROVE</button><button class="btn-rej" onclick="handleApprPage(this)">REJECT</button><button class="pbtn-ghost" onclick="handleApprPage(this)">DEFER</button></div>
+          </div>
+          <div class="appr-page-card glass" data-id="p6">
+            <div class="apc-top"><div style="display:flex;gap:10px;align-items:center"><div class="apc-ch-icon email"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg></div><div><div class="apc-name">Chris M.</div><div class="apc-sub">Email Operator · 7h pending</div></div></div><span class="risk high">HIGH</span></div>
+            <div class="apc-summary">Send personalized follow-up referencing last week's discovery call notes and action items.</div>
+            <div class="apc-reason">Reason: Contains personalized sales content</div>
+            <div class="apc-btns"><button class="btn-appr" onclick="handleApprPage(this)">APPROVE</button><button class="btn-rej" onclick="handleApprPage(this)">REJECT</button><button class="pbtn-ghost" onclick="handleApprPage(this)">DEFER</button></div>
+          </div>
+        </div>
+        <div class="appr-section-lbl collapsible" id="completed-toggle" onclick="toggleCompletedSection()">COMPLETED <span id="completed-chevron" style="margin-left:auto">▼</span></div>
+        <div id="appr-completed-section" style="display:none">
+          <div class="appr-page-grid">
+            <div class="appr-done-card glass"><div style="display:flex;align-items:center;justify-content:space-between"><span class="appr-done-name">Marcus T. — Proposal reply sent</span><span class="decision approved">APPROVED</span></div><div class="appr-done-meta">Jake B. · 2h ago</div></div>
+            <div class="appr-done-card glass"><div style="display:flex;align-items:center;justify-content:space-between"><span class="appr-done-name">Inbound lead — Entity record created</span><span class="decision approved">APPROVED</span></div><div class="appr-done-meta">Jake B. · 3h ago</div></div>
+            <div class="appr-done-card glass"><div style="display:flex;align-items:center;justify-content:space-between"><span class="appr-done-name">Spam input — Flagged as noise, skipped</span><span class="decision rejected">REJECTED</span></div><div class="appr-done-meta">Jake B. · 4h ago</div></div>
+            <div class="appr-done-card glass"><div style="display:flex;align-items:center;justify-content:space-between"><span class="appr-done-name">Sarah K. — Support ticket created</span><span class="decision approved">APPROVED</span></div><div class="appr-done-meta">Jake B. · 5h ago</div></div>
+            <div class="appr-done-card glass"><div style="display:flex;align-items:center;justify-content:space-between"><span class="appr-done-name">Daily digest — Summary sent to Slack</span><span class="decision approved">APPROVED</span></div><div class="appr-done-meta">Jake B. · 7h ago</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ SETTINGS PAGE ══ -->
+      <div class="page" id="page-settings">
+        <div class="page-head"><h2>Settings</h2></div>
+        <div class="settings-wrap">
+          <div class="settings-nav glass">
+            <div class="settings-nav-item active" data-sec="general" onclick="switchSettings(this,'general')">General</div>
+            <div class="settings-nav-item" data-sec="appearance" onclick="switchSettings(this,'appearance')">Appearance</div>
+            <div class="settings-nav-item" data-sec="notifications" onclick="switchSettings(this,'notifications')">Notifications</div>
+            <div class="settings-nav-item" data-sec="integrations" onclick="switchSettings(this,'integrations')">Integrations</div>
+            <div class="settings-nav-item" data-sec="team" onclick="switchSettings(this,'team')">Team</div>
+            <div class="settings-nav-item" data-sec="billing" onclick="switchSettings(this,'billing')">Billing</div>
+            <div class="settings-nav-item" data-sec="apikeys" onclick="switchSettings(this,'apikeys')">API Keys</div>
+          </div>
+          <div class="settings-content">
+
+            <!-- General -->
+            <div class="settings-section active" id="ss-general">
+              <div class="scard glass"><h3>GENERAL</h3>
+                <div class="srow"><div><div class="srow-lbl">Dashboard Name</div></div><input class="sinput" value="GATSV OS"/></div>
+                <div class="srow"><div><div class="srow-lbl">Timezone</div></div><select class="sinput" style="cursor:pointer"><option selected>America/Los_Angeles</option><option>America/New_York</option><option>America/Chicago</option><option>UTC</option></select></div>
+                <div class="srow"><div><div class="srow-lbl">Language</div></div><select class="sinput" style="cursor:pointer"><option selected>English (US)</option><option>English (UK)</option></select></div>
+                <div style="margin-top:20px"><button class="pbtn-primary" onclick="showToast('Settings saved')">Save Changes</button></div>
+              </div>
+            </div>
+
+            <!-- Appearance -->
+            <div class="settings-section" id="ss-appearance">
+              <div class="scard glass">
+                <div style="margin-bottom:20px">
+                  <div style="font-size:16px;font-weight:700;margin-bottom:6px">CUSTOMIZE YOUR DASHBOARD</div>
+                  <div style="font-size:12px;color:var(--text-muted)">The background stays pure black. Customize the glass tint and accent colors.</div>
+                </div>
+                <h3>GLASS TINT</h3>
+                <div class="swatch-row" id="tint-swatches">
+                  <div class="swatch-item selected" data-surface="rgba(255,255,255,0.05)" data-hover="rgba(255,255,255,0.09)" onclick="applyTint(this)" title="Default"><div class="swatch-dot" style="background:rgba(255,255,255,0.25)"></div><div class="swatch-nm">Default</div></div>
+                  <div class="swatch-item" data-surface="rgba(79,110,247,0.08)" data-hover="rgba(79,110,247,0.14)" onclick="applyTint(this)" title="Blue"><div class="swatch-dot" style="background:#4f6ef7"></div><div class="swatch-nm">Blue</div></div>
+                  <div class="swatch-item" data-surface="rgba(147,51,234,0.08)" data-hover="rgba(147,51,234,0.14)" onclick="applyTint(this)" title="Purple"><div class="swatch-dot" style="background:#9333ea"></div><div class="swatch-nm">Purple</div></div>
+                  <div class="swatch-item" data-surface="rgba(6,182,212,0.08)" data-hover="rgba(6,182,212,0.14)" onclick="applyTint(this)" title="Cyan"><div class="swatch-dot" style="background:#06b6d4"></div><div class="swatch-nm">Cyan</div></div>
+                  <div class="swatch-item" data-surface="rgba(16,185,129,0.08)" data-hover="rgba(16,185,129,0.14)" onclick="applyTint(this)" title="Green"><div class="swatch-dot" style="background:#10b981"></div><div class="swatch-nm">Green</div></div>
+                  <div class="swatch-item" data-surface="rgba(244,63,94,0.08)" data-hover="rgba(244,63,94,0.14)" onclick="applyTint(this)" title="Rose"><div class="swatch-dot" style="background:#f43f5e"></div><div class="swatch-nm">Rose</div></div>
+                  <div class="swatch-item" data-surface="rgba(245,158,11,0.08)" data-hover="rgba(245,158,11,0.14)" onclick="applyTint(this)" title="Amber"><div class="swatch-dot" style="background:#f59e0b"></div><div class="swatch-nm">Amber</div></div>
+                  <div class="swatch-item" data-surface="rgba(100,116,139,0.08)" data-hover="rgba(100,116,139,0.14)" onclick="applyTint(this)" title="Slate"><div class="swatch-dot" style="background:#64748b"></div><div class="swatch-nm">Slate</div></div>
+                </div>
+                <h3 style="margin-top:24px">ACCENT COLOR</h3>
+                <div class="swatch-row" id="accent-swatches">
+                  <div class="swatch-item selected" data-accent="#4f6ef7" onclick="applyAccent(this)" title="Electric Blue"><div class="swatch-dot" style="background:#4f6ef7"></div><div class="swatch-nm">Blue</div></div>
+                  <div class="swatch-item" data-accent="#9333ea" onclick="applyAccent(this)" title="Purple"><div class="swatch-dot" style="background:#9333ea"></div><div class="swatch-nm">Purple</div></div>
+                  <div class="swatch-item" data-accent="#06b6d4" onclick="applyAccent(this)" title="Cyan"><div class="swatch-dot" style="background:#06b6d4"></div><div class="swatch-nm">Cyan</div></div>
+                  <div class="swatch-item" data-accent="#10b981" onclick="applyAccent(this)" title="Emerald"><div class="swatch-dot" style="background:#10b981"></div><div class="swatch-nm">Emerald</div></div>
+                  <div class="swatch-item" data-accent="#f43f5e" onclick="applyAccent(this)" title="Rose"><div class="swatch-dot" style="background:#f43f5e"></div><div class="swatch-nm">Rose</div></div>
+                  <div class="swatch-item" data-accent="#f59e0b" onclick="applyAccent(this)" title="Amber"><div class="swatch-dot" style="background:#f59e0b"></div><div class="swatch-nm">Amber</div></div>
+                </div>
+                <h3 style="margin-top:24px">SIDEBAR WIDTH</h3>
+                <div class="toggle-btn-group"><button class="tbtn active" onclick="setSidebarWidth(this,'full')">Full</button><button class="tbtn" onclick="setSidebarWidth(this,'compact')">Compact</button></div>
+                <h3 style="margin-top:24px">FONT SIZE</h3>
+                <div class="radio-group">
+                  <label class="radio-item"><input type="radio" name="fontsize" value="small" onchange="setFontScale(0.92)"> Small</label>
+                  <label class="radio-item"><input type="radio" name="fontsize" value="medium" checked onchange="setFontScale(1)"> Medium</label>
+                  <label class="radio-item"><input type="radio" name="fontsize" value="large" onchange="setFontScale(1.08)"> Large</label>
+                </div>
+                <div style="margin-top:24px"><button class="pbtn-ghost" onclick="resetAppearance()">Reset to Defaults</button></div>
+              </div>
+            </div>
+
+            <!-- Notifications -->
+            <div class="settings-section" id="ss-notifications">
+              <div class="scard glass"><h3>NOTIFICATION SETTINGS</h3>
+                <div class="toggle-row"><span>Email alerts</span><label class="tog"><input type="checkbox" checked><span class="tog-sl"></span></label></div>
+                <div class="toggle-row"><span>Slack alerts</span><label class="tog"><input type="checkbox" checked><span class="tog-sl"></span></label></div>
+                <div class="toggle-row"><span>Error notifications</span><label class="tog"><input type="checkbox" checked><span class="tog-sl"></span></label></div>
+                <div class="toggle-row"><span>Daily digest</span><label class="tog"><input type="checkbox" checked><span class="tog-sl"></span></label></div>
+                <div class="toggle-row"><span>Weekly report</span><label class="tog"><input type="checkbox"><span class="tog-sl"></span></label></div>
+              </div>
+            </div>
+
+            <!-- Integrations -->
+            <div class="settings-section" id="ss-integrations">
+              <div class="scard glass"><h3>CONNECTED INTEGRATIONS</h3>
+                <div class="integ-grid">
+                  <div class="integ-card"><div class="integ-icon">⚡</div><div class="integ-name">Slack</div><div class="integ-status connected">● Connected</div><button class="pbtn-ghost" style="font-size:9px;padding:5px 12px" onclick="showToast('Disconnected Slack')">DISCONNECT</button></div>
+                  <div class="integ-card"><div class="integ-icon">📧</div><div class="integ-name">Postmark</div><div class="integ-status connected">● Connected</div><button class="pbtn-ghost" style="font-size:9px;padding:5px 12px" onclick="showToast('Disconnected Postmark')">DISCONNECT</button></div>
+                  <div class="integ-card"><div class="integ-icon">💬</div><div class="integ-name">Sendblue</div><div class="integ-status connected">● Connected</div><button class="pbtn-ghost" style="font-size:9px;padding:5px 12px" onclick="showToast('Disconnected Sendblue')">DISCONNECT</button></div>
+                  <div class="integ-card"><div class="integ-icon">🗄</div><div class="integ-name">Supabase</div><div class="integ-status connected">● Connected</div><button class="pbtn-ghost" style="font-size:9px;padding:5px 12px" onclick="showToast('Disconnected Supabase')">DISCONNECT</button></div>
+                  <div class="integ-card"><div class="integ-icon">🐙</div><div class="integ-name">GitHub</div><div class="integ-status">● Not connected</div><button class="pbtn-primary" style="font-size:9px;padding:5px 12px" onclick="showToast('GitHub OAuth coming soon')">CONNECT</button></div>
+                  <div class="integ-card"><div class="integ-icon">📝</div><div class="integ-name">Notion</div><div class="integ-status">● Not connected</div><button class="pbtn-primary" style="font-size:9px;padding:5px 12px" onclick="showToast('Notion OAuth coming soon')">CONNECT</button></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Team -->
+            <div class="settings-section" id="ss-team">
+              <div class="scard glass"><h3>TEAM MEMBERS</h3>
+                <div class="team-row"><div class="sb-avatar" style="width:36px;height:36px;font-size:12px">JB</div><div style="flex:1"><div style="font-size:13px;font-weight:600">Jake Bickford</div><div style="font-size:11px;color:var(--text-muted)">jake@gatsv.com</div></div><span class="risk low" style="font-size:9px">OWNER</span></div>
+                <div style="margin-top:16px"><button class="pbtn-primary" onclick="showToast('Team invites coming soon')">+ Invite Member</button></div>
+              </div>
+            </div>
+
+            <!-- Billing -->
+            <div class="settings-section" id="ss-billing">
+              <div class="scard glass"><h3>CURRENT PLAN</h3>
+                <div class="billing-plan-card"><div class="billing-plan-name">MANAGED SERVICE</div><div class="billing-plan-price">$2,500<span>/mo</span></div><div class="billing-plan-meta">Next billing: May 1, 2026 · Visa ···· 6411</div><div class="billing-usage"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:11px;color:var(--text-muted)">Usage</span><span style="font-family:var(--font-mono);font-size:11px">47 / ∞ requests</span></div><div class="billing-bar"><div class="billing-bar-fill" style="width:12%"></div></div></div><button class="pbtn-primary" onclick="showToast('Plan upgrade coming soon')" style="margin-top:16px">Upgrade Plan</button></div>
+                <h3 style="margin-top:24px">INVOICES</h3>
+                <table class="invoice-table">
+                  <thead><tr><th>Date</th><th>Amount</th><th>Status</th><th></th></tr></thead>
+                  <tbody>
+                    <tr><td>Apr 1, 2026</td><td>$2,500</td><td><span class="risk low">PAID</span></td><td><button class="pbtn-ghost" style="font-size:9px;padding:4px 10px" onclick="showToast('Downloading invoice…')">↓ PDF</button></td></tr>
+                    <tr><td>Mar 1, 2026</td><td>$2,500</td><td><span class="risk low">PAID</span></td><td><button class="pbtn-ghost" style="font-size:9px;padding:4px 10px" onclick="showToast('Downloading invoice…')">↓ PDF</button></td></tr>
+                    <tr><td>Feb 1, 2026</td><td>$2,500</td><td><span class="risk low">PAID</span></td><td><button class="pbtn-ghost" style="font-size:9px;padding:4px 10px" onclick="showToast('Downloading invoice…')">↓ PDF</button></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- API Keys -->
+            <div class="settings-section" id="ss-apikeys">
+              <div class="scard glass"><h3>API KEYS</h3>
+                <div class="apikey-row"><div><div style="font-family:var(--font-mono);font-size:12px;color:var(--text-primary)">sk-...a4f2</div><div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);margin-top:2px">Created Mar 12, 2026 · Last used 2h ago</div></div><button class="pbtn-ghost" style="color:var(--red);border-color:rgba(255,68,68,0.3)" onclick="showToast('Key revoked')">REVOKE</button></div>
+                <div class="apikey-row"><div><div style="font-family:var(--font-mono);font-size:12px;color:var(--text-primary)">sk-...9d1e</div><div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);margin-top:2px">Created Jan 5, 2026 · Last used 7d ago</div></div><button class="pbtn-ghost" style="color:var(--red);border-color:rgba(255,68,68,0.3)" onclick="showToast('Key revoked')">REVOKE</button></div>
+                <div style="margin-top:20px"><button class="pbtn-primary" onclick="showToast('New API key generated — copy it now, it won\'t be shown again')">+ Generate New Key</button></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ HELP PAGE ══ -->
+      <div class="page" id="page-help">
+        <div class="page-head"><h2>Help &amp; Documentation</h2></div>
+        <div class="help-search-wrap">
+          <div class="help-search glass">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="color:var(--text-muted);flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803 7.5 7.5 0 0015.803 15.803z"/></svg>
+            <input type="text" placeholder="Search documentation…" class="help-search-input"/>
+          </div>
+        </div>
+        <div class="help-grid">
+          <div class="help-card glass" onclick="showToast('Documentation coming soon')"><div class="help-card-icon">🚀</div><div class="help-card-title">Getting Started</div><div class="help-card-desc">Set up your GATSV OS instance and connect your first integration in minutes.</div></div>
+          <div class="help-card glass" onclick="showToast('Documentation coming soon')"><div class="help-card-icon">📡</div><div class="help-card-title">API Docs</div><div class="help-card-desc">Full reference for all endpoints, webhooks, and event schemas.</div></div>
+          <div class="help-card glass" onclick="showToast('Documentation coming soon')"><div class="help-card-icon">🤖</div><div class="help-card-title">Agent Configuration</div><div class="help-card-desc">Configure routing rules, confidence thresholds, and operator behavior.</div></div>
+          <div class="help-card glass" onclick="showToast('Documentation coming soon')"><div class="help-card-icon">🔌</div><div class="help-card-title">Integrations</div><div class="help-card-desc">Connect Slack, Postmark, Sendblue, Supabase, and more.</div></div>
+          <div class="help-card glass" onclick="showToast('Documentation coming soon')"><div class="help-card-icon">🔧</div><div class="help-card-title">Troubleshooting</div><div class="help-card-desc">Common issues, error codes, and how to read system health logs.</div></div>
+          <div class="help-card glass" onclick="showToast('Opening support channel…')"><div class="help-card-icon">💬</div><div class="help-card-title">Contact Support</div><div class="help-card-desc">Reach the GATSV team directly for configuration help or bug reports.</div></div>
+        </div>
+        <div class="help-section-head">RECENT UPDATES</div>
+        <div class="help-updates">
+          <div class="help-update-row glass"><div class="help-update-date">Apr 1, 2026</div><div class="help-update-text"><strong>Slice 13:</strong> Slack operator surface complete — approvals queue, daily summary, and error alerts now fully wired.</div></div>
+          <div class="help-update-row glass"><div class="help-update-date">Mar 28, 2026</div><div class="help-update-text"><strong>Slice 11–12:</strong> Router and Operator agents deployed — automated event classification and action execution operational.</div></div>
+          <div class="help-update-row glass"><div class="help-update-date">Mar 20, 2026</div><div class="help-update-text"><strong>Slice 10:</strong> iMessage bot loop complete — reminders, notes, daily digest, and cancel commands all working.</div></div>
+        </div>
+      </div>
 
     </div><!-- /content -->
   </div><!-- /main -->
