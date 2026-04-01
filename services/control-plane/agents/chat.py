@@ -136,10 +136,12 @@ async def _reply(parsed: ParsedInbound, start: float) -> ChatResult:
     messages = [{"role": row["role"], "content": row["content"]} for row in history]
 
     # 3. Call Claude with full context and all registered tools.
+    system_prompt = _build_system_prompt()
+    logger.info("chat DEBUG: system_prompt = %r", system_prompt)
     response = await _anthropic.messages.create(
         model="claude-sonnet-4-6",
         max_tokens=1024,
-        system=_build_system_prompt(),
+        system=system_prompt,
         messages=messages,
         tools=tool_registry.get_api_tools(),
     )
@@ -210,6 +212,7 @@ async def _handle_tool_use(response, phone: str) -> str:
     tool_block = next(
         block for block in response.content if block.type == "tool_use"
     )
+    logger.info("chat DEBUG: tool_use name=%r input=%r", tool_block.name, tool_block.input)
     ctx = tool_registry.ToolContext(sender_phone=phone)
     result = await tool_registry.dispatch(tool_block.name, tool_block.input, ctx)
 

@@ -23,6 +23,8 @@ async def _handle(tool_input: dict, ctx: ToolContext) -> ToolResult:
     raw_dt = tool_input["scheduled_at"]
     reminder_text = tool_input["reminder_text"].strip()
 
+    logger.info("set_reminder DEBUG: raw scheduled_at from Claude = %r", raw_dt)
+
     scheduled_at = datetime.fromisoformat(raw_dt)
     if scheduled_at.tzinfo is None:
         scheduled_at = scheduled_at.replace(tzinfo=_PACIFIC).astimezone(timezone.utc)
@@ -41,6 +43,12 @@ async def _handle(tool_input: dict, ctx: ToolContext) -> ToolResult:
     pt = scheduled_at.astimezone(_PACIFIC)
     display_time = pt.strftime("%I:%M %p").lstrip("0")
 
+    logger.info(
+        "set_reminder DEBUG: tzinfo=%r, stored_utc=%s, display_pt=%s",
+        datetime.fromisoformat(raw_dt).tzinfo,
+        scheduled_at.isoformat(),
+        display_time,
+    )
     logger.info(
         "set_reminder: saved task for %s at %s UTC (%s PT)",
         ctx.sender_phone,
