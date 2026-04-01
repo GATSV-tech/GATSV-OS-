@@ -55,6 +55,12 @@ class Settings(BaseSettings):
     # How often (in seconds) the scheduler polls Supabase for due tasks.
     scheduler_poll_interval_seconds: int = 60
 
+    # Slack operator surface (Slice 13+)
+    # How often (in seconds) the Slack scheduler polls for new approvals and errors.
+    slack_poll_interval_seconds: int = 60
+    # Time (HH:MM, 24h, Pacific) the Slack daily summary is posted each day.
+    slack_summary_time_pt: str = "08:00"
+
     # Daily digest — proactive morning summary (Slice 10+)
     # Jake's phone number — required for all proactive outbound sends.
     jake_phone_number: Optional[str] = None

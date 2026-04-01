@@ -1,5 +1,94 @@
 # GATSV OS — Session Handoff
 
+## Last Updated
+2026-04-01 — Operator agent complete (Slice 12)
+
+Operator agent (`agents/operator.py`) is the third agent in the pipeline.
+Receives a `RouterResult`, acts on `sales` and `support` buckets only.
+All other buckets (delivery, founder_review, noise) are skipped without any LLM call.
+
+**Flow:**
+1. Receives `RouterResult` — skips if `status != "routed"` or bucket not in `[sales, support]`.
+2. Fetches full event from DB.
+3. Calls Claude Haiku with a `plan_actions` tool → produces list of `{action_type, risk, params}`.
+4. Per action: `risk=low` → execute immediately; `risk=high` → pending_approval action + approvals row.
+5. Updates event to `status="actioned"`. Writes plan_actions action row (with cost) + health_log.
+6. Returns `OperatorResult(actions_executed, actions_queued, status)`. Never raises.
+
+**Action types (v1):**
+- `create_entity_note` (always low): writes to `memories` table with `memory_type="note"`.
+  Silently skipped if no entity_id or no note content.
+- `send_ack` (sales=low, support=high): drafts acknowledgment email.
+  Low-risk: action row written as `status="executed"`, `transport="pending_connector"`.
+  High-risk: action row as `status="pending_approval"` + approval row with self-contained context.
+  Silently skipped if no sender_email.
+
+**New DB modules:**
+- `db/memories.py` — `create`, `list_for_entity`
+- `db/approvals.py` — `create`, `list_open`, `update_decision`
+
+**Files changed:**
+- `agents/operator.py` — new Operator agent
+- `db/memories.py` — new
+- `db/approvals.py` — new
+- `routers/webhooks.py` — Operator chained after Router on `/email` and `/form`
+- `tests/test_operator.py` — 11 tests, all passing
+
+Tests: 98 passing (2 pre-existing failures in test_health.py).
+
+## Next Task
+- Build the Slack operator surface: approvals queue, daily summary, error alerts.
+  The `approvals` table is ready; the Slack interface reads it and lets founder approve/reject.
+- OR: build outbound email connector (Postmark) to pick up `send_ack` actions with
+  `transport="pending_connector"` and deliver them.
+- OR: deploy to VPS.
+
+---
+
+## Last Updated
+2026-04-01 — Router agent complete (Slice 11)
+
+Router agent (`agents/router.py`) is the first agent in the GATSV OS event mesh.
+Wired after Gatekeeper on the email and form webhook paths. iMessage path unchanged
+(chat agent handles that loop directly).
+
+**Classification:** Claude Haiku (`claude-haiku-4-5-20251001`) called with a
+`classify_event` tool_use call. Produces:
+- `bucket`: `sales | delivery | support | founder_review | noise`
+- `priority`: `high | medium | low`
+- `confidence`: float 0.0–1.0
+- `reasoning`: one-sentence explanation (stored in action payload for auditability)
+
+**Flow:**
+1. Receives `GatekeeperResult` — skips duplicates without any LLM call.
+2. Fetches full event row via new `db/events.get_by_id`.
+3. Calls Haiku with system prompt + user message (source/sender/subject/body, body truncated at 1500 chars).
+4. Updates event row: `bucket`, `priority`, `confidence`, `status="routed"` via new `db/events.update`.
+5. Writes action row (includes `token_input`, `token_output`, `usd_cost` for cost tracking).
+6. Writes health_log. Returns `RouterResult(status="routed|skipped|error")`.
+7. Errors are caught, logged to health_logs, and returned as `status="error"` — never raises.
+
+**Ruflo:** Swarm initialized (`swarm-1775052445682-o1170e`, hierarchical-mesh, specialized,
+max 10 agents). `router-agent` spawned as a mesh-coordinator node.
+
+**Files changed:**
+- `agents/router.py` — new Router agent
+- `db/events.py` — added `get_by_id`, `update`
+- `routers/webhooks.py` — Router chained after Gatekeeper on `/email` and `/form`
+- `tests/test_router.py` — 9 tests, all passing
+
+Tests: 87 passing (2 pre-existing failures in test_health.py).
+
+## Next Task
+- Build the Operator agent: receives a RouterResult for `sales` or `support` buckets and
+  executes safe automated actions (e.g., send acknowledgment email, create entity note).
+  High-risk actions go to the `approvals` table first.
+- OR: wire up the Slack operator surface (CLAUDE.md v1 interface).
+- OR: deploy to VPS.
+
+---
+
+
 ## Project Focus
 Personal iMessage Claude bot. Jake texts it and it replies. It can proactively
 send reminders, daily summaries, and timed notifications. The bot runs on the

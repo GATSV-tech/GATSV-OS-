@@ -5,6 +5,8 @@ from fastapi import APIRouter, Query, Request
 from fastapi.responses import JSONResponse
 
 from agents import gatekeeper
+from agents import router as router_agent
+from agents import operator as operator_agent
 from agents import chat
 from config import settings
 from connectors.email import parse_postmark_inbound
@@ -50,11 +52,17 @@ async def inbound_email(
 
     raw = await request.json()
     parsed = parse_postmark_inbound(raw)
-    result = await gatekeeper.run(parsed)
+    gk_result = await gatekeeper.run(parsed)
     logger.debug(
         "Gatekeeper result: status=%s event_id=%s source_id=%s",
-        result.status, result.event_id, parsed.source_id,
+        gk_result.status, gk_result.event_id, parsed.source_id,
     )
+    rt_result = await router_agent.run(gk_result)
+    logger.debug(
+        "Router result: status=%s event_id=%s bucket=%s priority=%s",
+        rt_result.status, rt_result.event_id, rt_result.bucket, rt_result.priority,
+    )
+    await operator_agent.run(rt_result)
     return {"received": True}
 
 
@@ -86,11 +94,17 @@ async def inbound_form(
 
     raw = await request.json()
     parsed = parse_tally_inbound(raw)
-    result = await gatekeeper.run(parsed)
+    gk_result = await gatekeeper.run(parsed)
     logger.debug(
         "Gatekeeper result: status=%s event_id=%s source_id=%s",
-        result.status, result.event_id, parsed.source_id,
+        gk_result.status, gk_result.event_id, parsed.source_id,
     )
+    rt_result = await router_agent.run(gk_result)
+    logger.debug(
+        "Router result: status=%s event_id=%s bucket=%s priority=%s",
+        rt_result.status, rt_result.event_id, rt_result.bucket, rt_result.priority,
+    )
+    await operator_agent.run(rt_result)
     return {"received": True}
 
 
