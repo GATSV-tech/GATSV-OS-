@@ -51,6 +51,10 @@ class Settings(BaseSettings):
     # may load a partially-paired window.
     chat_history_limit: int = 20
 
+    # Scheduler — proactive outbound reminders and notifications (Slice 9+)
+    # How often (in seconds) the scheduler polls Supabase for due tasks.
+    scheduler_poll_interval_seconds: int = 60
+
 
 # Single shared instance — import this everywhere, never instantiate Settings again
 settings = Settings()

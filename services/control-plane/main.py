@@ -5,6 +5,7 @@ from fastapi import FastAPI
 
 from config import settings
 from routers import health, webhooks
+from scheduler import runner as scheduler
 
 logging.basicConfig(
     level=getattr(logging, settings.log_level.upper(), logging.INFO),
@@ -19,7 +20,9 @@ async def lifespan(app: FastAPI):
         "GATSV OS Control Plane starting",
         extra={"env": settings.app_env, "version": settings.app_version},
     )
+    scheduler.start()
     yield
+    scheduler.stop()
     logger.info("GATSV OS Control Plane shutting down")
 
 

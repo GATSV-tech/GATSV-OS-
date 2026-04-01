@@ -152,6 +152,22 @@ class Memory(MemoryCreate):
     created_at: datetime
 
 
+# ─── ScheduledTask ───────────────────────────────────────────────────────────
+
+class ScheduledTaskCreate(BaseModel):
+    sender_phone: str
+    content: str
+    scheduled_at: datetime
+
+
+class ScheduledTask(ScheduledTaskCreate):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    status: str   # 'pending' | 'sent' | 'failed' | 'cancelled'
+    created_at: datetime
+
+
 # ─── HealthLog ───────────────────────────────────────────────────────────────
 
 class HealthLogCreate(BaseModel):

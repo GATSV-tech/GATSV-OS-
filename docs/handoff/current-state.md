@@ -28,19 +28,36 @@ left in place, not extended.
 - [x] Slice 6: Sendblue iMessage connector
 - [x] Slice 7: Claude reply loop — inbound iMessage → Claude API → Sendblue outbound reply
 - [x] Slice 8: Conversation memory — rolling context window persisted in Supabase
-- [ ] Slice 9: Proactive outbound — scheduled reminders and timed notifications
+- [x] Slice 9: Proactive outbound — scheduled reminders and timed notifications
 - [ ] Slice 10: Daily summaries and digest
 
 ## Next Task
-Slice 9: Proactive outbound — scheduled reminders and timed notifications.
+Slice 10: Daily summaries and digest.
 
 ## Last Updated
-2026-03-31 — Slice 8 complete: conversation memory wired into chat agent.
-New table chat_messages (sender_phone, role, content). User turn saved before
-Claude call to prevent loss on generation failure. History fetched newest-first
-then reversed to chronological order. Assistant turn saved after reply sent.
-DB failures on append are logged but never crash the reply. Window size
-configurable via CHAT_HISTORY_LIMIT env var (default 20). Files changed:
-db/migrations/004_add_chat_messages.sql, db/chat_messages.py, agents/chat.py,
-config.py, tests/test_chat_agent.py. 51 tests passing (2 pre-existing failures
-in test_health.py unrelated to this slice).
+2026-04-01 — Slice 9 complete: proactive outbound with tool registry architecture.
+
+New table: scheduled_tasks (sender_phone, content, scheduled_at, status).
+Scheduler: asyncio polling loop (no extra dependency), started/stopped in FastAPI
+lifespan, polls every SCHEDULER_POLL_INTERVAL_SECONDS (default 60). Per-task
+failure isolation — one bad Sendblue send does not block remaining tasks.
+
+Tool registry: agents/tool_registry.py defines ToolDefinition, ToolContext,
+ToolResult, register(), get_api_tools(), dispatch(). chat.py is decoupled from
+individual tool names. Adding a new tool = new file in agents/tools/ + one import
+line in agents/tools/__init__.py.
+
+set_reminder tool: Claude calls it when it detects a reminder intent. Handler
+saves scheduled_task row, returns Pacific-time ack ("Got it — I'll remind you
+at 3:00 PM PT."). System prompt injects current Pacific time so Claude can
+resolve relative times ("at 3pm", "in 2 hours"). Ack is persisted as assistant
+turn and sent via Sendblue. Action row uses action_type='tool_use'.
+
+Files changed: db/migrations/005_add_scheduled_tasks.sql, db/scheduled_tasks.py,
+db/schemas.py (ScheduledTaskCreate/ScheduledTask), agents/tool_registry.py,
+agents/tools/__init__.py, agents/tools/set_reminder.py, agents/chat.py,
+scheduler/__init__.py, scheduler/runner.py, main.py, config.py,
+tests/test_chat_agent.py, tests/test_scheduler.py.
+
+New env vars: SCHEDULER_POLL_INTERVAL_SECONDS (default 60).
+55 tests passing (2 pre-existing failures in test_health.py).
