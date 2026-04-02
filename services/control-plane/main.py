@@ -8,6 +8,7 @@ from routers import health, webhooks, slack_router
 from scheduler import runner as task_scheduler
 from scheduler import digest as digest_scheduler
 from scheduler import slack_scheduler
+from scheduler import email_dispatcher
 
 logging.basicConfig(
     level=getattr(logging, settings.log_level.upper(), logging.INFO),
@@ -23,6 +24,7 @@ async def lifespan(app: FastAPI):
         extra={"env": settings.app_env, "version": settings.app_version},
     )
     task_scheduler.start()
+    email_dispatcher.start()
 
     if settings.jake_phone_number:
         digest_scheduler.start(settings.jake_phone_number)
@@ -37,6 +39,7 @@ async def lifespan(app: FastAPI):
     yield
 
     task_scheduler.stop()
+    email_dispatcher.stop()
     digest_scheduler.stop()
     slack_scheduler.stop()
     logger.info("GATSV OS Control Plane shutting down")

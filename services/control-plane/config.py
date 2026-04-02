@@ -55,6 +55,10 @@ class Settings(BaseSettings):
     # How often (in seconds) the scheduler polls Supabase for due tasks.
     scheduler_poll_interval_seconds: int = 60
 
+    # Email dispatcher — outbound send_ack delivery (Slice 14+)
+    # How often (in seconds) the dispatcher polls for pending send_ack actions.
+    email_poll_interval_seconds: int = 60
+
     # Slack operator surface (Slice 13+)
     # How often (in seconds) the Slack scheduler polls for new approvals and errors.
     slack_poll_interval_seconds: int = 60
