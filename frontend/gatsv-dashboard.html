@@ -1775,9 +1775,11 @@ body {
             <!-- API Keys -->
             <div class="settings-section" id="ss-apikeys">
               <div class="scard glass"><h3>API KEYS</h3>
-                <div class="apikey-row"><div><div style="font-family:var(--font-mono);font-size:12px;color:var(--text-primary)">sk-...a4f2</div><div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);margin-top:2px">Created Mar 12, 2026 · Last used 2h ago</div></div><button class="pbtn-ghost" style="color:var(--red);border-color:rgba(255,68,68,0.3)" onclick="showToast('Key revoked')">REVOKE</button></div>
-                <div class="apikey-row"><div><div style="font-family:var(--font-mono);font-size:12px;color:var(--text-primary)">sk-...9d1e</div><div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);margin-top:2px">Created Jan 5, 2026 · Last used 7d ago</div></div><button class="pbtn-ghost" style="color:var(--red);border-color:rgba(255,68,68,0.3)" onclick="showToast('Key revoked')">REVOKE</button></div>
-                <div style="margin-top:20px"><button class="pbtn-primary" onclick="showToast('New API key generated — copy it now, it won\'t be shown again')">+ Generate New Key</button></div>
+                <div id="apikey-list">
+                  <div class="apikey-row" id="apikey-a4f2"><div><div style="font-family:var(--font-mono);font-size:12px;color:var(--text-primary)">sk-...a4f2</div><div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);margin-top:2px">Created Mar 12, 2026 · Last used 2h ago</div></div><button class="pbtn-ghost" style="color:var(--red);border-color:rgba(255,68,68,0.3)" onclick="revokeApiKey('apikey-a4f2','sk-...a4f2')">REVOKE</button></div>
+                  <div class="apikey-row" id="apikey-9d1e"><div><div style="font-family:var(--font-mono);font-size:12px;color:var(--text-primary)">sk-...9d1e</div><div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);margin-top:2px">Created Jan 5, 2026 · Last used 7d ago</div></div><button class="pbtn-ghost" style="color:var(--red);border-color:rgba(255,68,68,0.3)" onclick="revokeApiKey('apikey-9d1e','sk-...9d1e')">REVOKE</button></div>
+                </div>
+                <div style="margin-top:20px"><button class="pbtn-primary" onclick="openApiKeyModal()">+ Generate New Key</button></div>
               </div>
             </div>
 
@@ -1854,6 +1856,45 @@ body {
   </div>
 </div>
 <div id="customizer-backdrop" style="display:none;position:fixed;inset:0;z-index:440"></div>
+
+<!-- ══ API KEY MODAL ══ -->
+<div id="apikey-modal-backdrop" style="display:none;position:fixed;inset:0;background:rgba(5,5,8,0.78);z-index:610;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)">
+  <div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:440px;background:rgba(14,14,22,0.97);border:1px solid rgba(255,255,255,0.13);border-radius:20px;box-shadow:0 24px 80px rgba(0,0,0,0.7);padding:28px;font-family:var(--font-sans)">
+    <div style="font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:0.18em;color:var(--text-muted);margin-bottom:18px">GENERATE API KEY</div>
+
+    <!-- Step 1: form -->
+    <div id="apikey-step-form">
+      <div style="margin-bottom:14px">
+        <label style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:0.1em;display:block;margin-bottom:6px">KEY NAME</label>
+        <input id="apikey-name-input" type="text" placeholder="e.g. Production Server"
+          style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 14px;font-size:13px;color:var(--text-primary);font-family:var(--font-sans);outline:none"/>
+      </div>
+      <div style="margin-bottom:22px">
+        <label style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:0.1em;display:block;margin-bottom:6px">DESCRIPTION</label>
+        <input id="apikey-desc-input" type="text" placeholder="What will this key be used for?"
+          style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 14px;font-size:13px;color:var(--text-primary);font-family:var(--font-sans);outline:none"/>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="pbtn-primary" onclick="generateApiKey()">GENERATE</button>
+        <button class="pbtn-ghost" onclick="closeApiKeyModal()">CANCEL</button>
+      </div>
+    </div>
+
+    <!-- Step 2: reveal -->
+    <div id="apikey-step-reveal" style="display:none">
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px">Your new API key has been generated:</div>
+      <div style="display:flex;align-items:center;gap:8px;background:var(--surface-deep);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:12px">
+        <code id="apikey-reveal-value" style="font-family:var(--font-mono);font-size:11px;color:var(--green);flex:1;word-break:break-all"></code>
+        <button id="apikey-copy-btn" onclick="copyApiKey()" style="font-family:var(--font-mono);font-size:10px;font-weight:700;padding:5px 12px;border-radius:8px;background:var(--accent-dim);border:1px solid rgba(79,110,247,0.35);color:var(--accent);cursor:pointer;white-space:nowrap;flex-shrink:0">COPY</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.2);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:22px">
+        <span style="font-size:14px">⚠️</span>
+        <span style="font-size:12px;color:var(--amber)">Store this key safely. It won't be shown again.</span>
+      </div>
+      <button class="pbtn-primary" onclick="doneApiKey()">DONE</button>
+    </div>
+  </div>
+</div>
 
 <!-- ══ INTEGRATION MODAL ══ -->
 <div id="integ-modal-backdrop" style="display:none;position:fixed;inset:0;background:rgba(5,5,8,0.75);z-index:600;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)" onclick="closeIntegModal()">
@@ -2938,6 +2979,89 @@ function handleApprPage(btn) {
     document.getElementById('atab-rejected').textContent = apprArchive.rejected.length;
     document.getElementById('atab-deferred').textContent = apprArchive.deferred.length;
   }, 300);
+}
+
+// ── API KEYS ──
+let _pendingApiKey = null;
+let _pendingApiKeyName = null;
+
+function openApiKeyModal() {
+  document.getElementById('apikey-name-input').value = '';
+  document.getElementById('apikey-desc-input').value = '';
+  document.getElementById('apikey-step-form').style.display = 'block';
+  document.getElementById('apikey-step-reveal').style.display = 'none';
+  document.getElementById('apikey-modal-backdrop').style.display = 'block';
+  setTimeout(() => document.getElementById('apikey-name-input').focus(), 50);
+}
+
+function closeApiKeyModal() {
+  document.getElementById('apikey-modal-backdrop').style.display = 'none';
+  _pendingApiKey = null;
+  _pendingApiKeyName = null;
+}
+
+function generateApiKey() {
+  const name = document.getElementById('apikey-name-input').value.trim();
+  const desc = document.getElementById('apikey-desc-input').value.trim();
+  const nameInput = document.getElementById('apikey-name-input');
+  const descInput = document.getElementById('apikey-desc-input');
+  let valid = true;
+  if (!name) { nameInput.style.borderColor = 'var(--red)'; setTimeout(() => nameInput.style.borderColor = '', 1200); valid = false; }
+  if (!desc)  { descInput.style.borderColor = 'var(--red)'; setTimeout(() => descInput.style.borderColor = '', 1200); valid = false; }
+  if (!valid) return;
+  // Generate fake 32-char hex key
+  const hex = Array.from({length: 32}, () => Math.floor(Math.random() * 16).toString(16)).join('');
+  _pendingApiKey = 'sk-' + hex;
+  _pendingApiKeyName = name;
+  document.getElementById('apikey-reveal-value').textContent = _pendingApiKey;
+  document.getElementById('apikey-copy-btn').textContent = 'COPY';
+  document.getElementById('apikey-step-form').style.display = 'none';
+  document.getElementById('apikey-step-reveal').style.display = 'block';
+}
+
+function copyApiKey() {
+  if (!_pendingApiKey) return;
+  navigator.clipboard.writeText(_pendingApiKey).catch(() => {});
+  const btn = document.getElementById('apikey-copy-btn');
+  btn.textContent = 'COPIED ✓';
+  btn.style.background = 'var(--green-dim)';
+  btn.style.borderColor = 'rgba(0,255,136,0.35)';
+  btn.style.color = 'var(--green)';
+  setTimeout(() => {
+    btn.textContent = 'COPY';
+    btn.style.background = '';
+    btn.style.borderColor = '';
+    btn.style.color = '';
+  }, 2000);
+}
+
+function doneApiKey() {
+  if (!_pendingApiKey) { closeApiKeyModal(); return; }
+  const last4 = _pendingApiKey.slice(-4);
+  const today = new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+  const rowId = 'apikey-' + last4;
+  const row = document.createElement('div');
+  row.className = 'apikey-row';
+  row.id = rowId;
+  row.innerHTML = `
+    <div>
+      <div style="font-family:var(--font-mono);font-size:12px;color:var(--text-primary)">sk-...${last4}</div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);margin-top:2px">${_pendingApiKeyName} · Created ${today} · Last used Never</div>
+    </div>
+    <button class="pbtn-ghost" style="color:var(--red);border-color:rgba(255,68,68,0.3)" onclick="revokeApiKey('${rowId}','sk-...${last4}')">REVOKE</button>`;
+  const list = document.getElementById('apikey-list');
+  list.insertBefore(row, list.firstChild);
+  closeApiKeyModal();
+  showToast('API key added');
+}
+
+function revokeApiKey(rowId, display) {
+  const row = document.getElementById(rowId);
+  if (!row) return;
+  row.style.transition = 'opacity 0.3s, transform 0.3s';
+  row.style.opacity = '0';
+  row.style.transform = 'translateX(10px)';
+  setTimeout(() => { row.remove(); showToast(display + ' revoked'); }, 300);
 }
 
 // ── INTEGRATIONS ──
