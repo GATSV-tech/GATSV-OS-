@@ -43,13 +43,9 @@
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{height:100%;overflow:hidden;background:#050508}
-body{height:100%;overflow:hidden}
-
 body {
-  background:
-    radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.03) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 80%, rgba(255,255,255,0.02) 0%, transparent 50%),
-    #050508;
+  height:100%;overflow:hidden;
+  background: radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.03) 0%, transparent 60%), radial-gradient(ellipse at 80% 80%, rgba(255,255,255,0.02) 0%, transparent 50%), #050508;
   font-family: var(--font-sans);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
@@ -1383,7 +1379,7 @@ body {
               <div class="agent-stat"><div class="agent-stat-val">—</div><div class="agent-stat-lbl">Queue</div></div>
               <div class="agent-stat"><div class="agent-stat-val" style="color:var(--green)">99%</div><div class="agent-stat-lbl">Uptime</div></div>
             </div>
-            <button class="btn-view-logs">View Logs</button>
+            <button class="btn-view-logs" data-agent="gatekeeper">View Logs</button>
           </div>
 
           <div class="agent-card glass">
@@ -1400,7 +1396,7 @@ body {
               <div class="agent-stat"><div class="agent-stat-val">—</div><div class="agent-stat-lbl">Queue</div></div>
               <div class="agent-stat"><div class="agent-stat-val" style="color:var(--green)">99%</div><div class="agent-stat-lbl">Uptime</div></div>
             </div>
-            <button class="btn-view-logs">View Logs</button>
+            <button class="btn-view-logs" data-agent="router">View Logs</button>
           </div>
 
           <div class="agent-card glass">
@@ -1417,7 +1413,7 @@ body {
               <div class="agent-stat"><div class="agent-stat-val" style="color:var(--accent)">3</div><div class="agent-stat-lbl">Queue</div></div>
               <div class="agent-stat"><div class="agent-stat-val" style="color:var(--green)">97%</div><div class="agent-stat-lbl">Uptime</div></div>
             </div>
-            <button class="btn-view-logs">View Logs</button>
+            <button class="btn-view-logs" data-agent="email-operator">View Logs</button>
           </div>
 
           <div class="agent-card glass">
@@ -1434,7 +1430,7 @@ body {
               <div class="agent-stat"><div class="agent-stat-val">0</div><div class="agent-stat-lbl">Queue</div></div>
               <div class="agent-stat"><div class="agent-stat-val" style="color:var(--green)">100%</div><div class="agent-stat-lbl">Uptime</div></div>
             </div>
-            <button class="btn-view-logs">View Logs</button>
+            <button class="btn-view-logs" data-agent="sms-operator">View Logs</button>
           </div>
 
         </div>
@@ -1452,6 +1448,13 @@ body {
             <div class="filter-pill" data-level="OK"    onclick="setLogFilter(this,'OK')">SUCCESS</div>
             <button class="autoscroll-btn on" id="autoscroll-btn" onclick="toggleAutoscroll()">↓ Auto-scroll ON</button>
           </div>
+          <div id="log-agent-filter-bar" style="display:none;align-items:center;gap:8px;margin-bottom:8px">
+            <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim)">AGENT FILTER:</span>
+            <div id="log-agent-pill" style="display:flex;align-items:center;gap:6px;background:var(--accent-dim);border:1px solid rgba(79,110,247,0.35);border-radius:20px;padding:3px 10px 3px 12px;font-family:var(--font-mono);font-size:11px;color:var(--accent)">
+              <span id="log-agent-pill-name"></span>
+              <button onclick="clearLogAgentFilter()" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:14px;line-height:1;padding:0 0 0 2px;opacity:0.7" title="Clear filter">×</button>
+            </div>
+          </div>
           <div class="terminal-widget glass">
             <div class="terminal-inner" id="terminal"></div>
           </div>
@@ -1461,72 +1464,25 @@ body {
       <!-- ══ INBOX PAGE ══ -->
       <div class="page" id="page-inbox">
         <div class="page-head"><h2>Inbox</h2><span class="page-head-badge">3 new</span></div>
+        <!-- Tabs -->
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
+          <button class="inbox-tab active" data-tab="all"      onclick="setInboxTab('all')">ALL <span class="inbox-tab-badge" id="itab-all">8</span></button>
+          <button class="inbox-tab"        data-tab="approved" onclick="setInboxTab('approved')">APPROVED <span class="inbox-tab-badge" id="itab-approved">0</span></button>
+          <button class="inbox-tab"        data-tab="rejected" onclick="setInboxTab('rejected')">REJECTED <span class="inbox-tab-badge" id="itab-rejected">0</span></button>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+            <input id="inbox-search" type="text" placeholder="Search sender or message…" oninput="renderInbox()"
+              style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 12px;font-size:12px;color:var(--text-primary);width:220px;font-family:var(--font-sans);outline:none"/>
+            <select id="inbox-sort" onchange="renderInbox()"
+              style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;font-size:12px;color:var(--text-muted);font-family:var(--font-sans);outline:none;cursor:pointer">
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+              <option value="channel">By Channel</option>
+              <option value="status">By Status</option>
+            </select>
+          </div>
+        </div>
         <div class="inbox-wrap">
           <div class="inbox-list" id="inbox-list">
-            <div class="inbox-item unread" data-idx="0" onclick="selectInbox(0)">
-              <div class="inbox-icon-wrap email"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg></div>
-              <div class="inbox-item-body">
-                <div class="inbox-item-row1"><span class="inbox-from">Marcus T.</span><span class="inbox-time">4m</span></div>
-                <div class="inbox-preview">Re: Q2 Proposal — wanted to follow up on the pricing discussion…</div>
-                <span class="ibadge new">New</span>
-              </div>
-            </div>
-            <div class="inbox-item unread" data-idx="1" onclick="selectInbox(1)">
-              <div class="inbox-icon-wrap email"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg></div>
-              <div class="inbox-item-body">
-                <div class="inbox-item-row1"><span class="inbox-from">Sarah K.</span><span class="inbox-time">18m</span></div>
-                <div class="inbox-preview">Form submission: Interested in services for my small agency…</div>
-                <span class="ibadge routed">Routed</span>
-              </div>
-            </div>
-            <div class="inbox-item" data-idx="2" onclick="selectInbox(2)">
-              <div class="inbox-icon-wrap sms"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 8.25h3m-3 3h3m-3 3h3"/></svg></div>
-              <div class="inbox-item-body">
-                <div class="inbox-item-row1"><span class="inbox-from">Daniel R.</span><span class="inbox-time">31m</span></div>
-                <div class="inbox-preview">Hey, just checking in on the support request I submitted…</div>
-                <span class="ibadge approved">Approved</span>
-              </div>
-            </div>
-            <div class="inbox-item" data-idx="3" onclick="selectInbox(3)">
-              <div class="inbox-icon-wrap slack"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg></div>
-              <div class="inbox-item-body">
-                <div class="inbox-item-row1"><span class="inbox-from">#ops-channel</span><span class="inbox-time">1h</span></div>
-                <div class="inbox-preview">Error alert: Email send failed after 3 retries — operator stalled</div>
-                <span class="ibadge done">Done</span>
-              </div>
-            </div>
-            <div class="inbox-item unread" data-idx="4" onclick="selectInbox(4)">
-              <div class="inbox-icon-wrap email"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg></div>
-              <div class="inbox-item-body">
-                <div class="inbox-item-row1"><span class="inbox-from">Jennifer L.</span><span class="inbox-time">2h</span></div>
-                <div class="inbox-preview">Partnership inquiry — I've been following your work for a while…</div>
-                <span class="ibadge new">New</span>
-              </div>
-            </div>
-            <div class="inbox-item" data-idx="5" onclick="selectInbox(5)">
-              <div class="inbox-icon-wrap email"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg></div>
-              <div class="inbox-item-body">
-                <div class="inbox-item-row1"><span class="inbox-from">Thomas B.</span><span class="inbox-time">3h</span></div>
-                <div class="inbox-preview">Support: Integration not responding after recent update…</div>
-                <span class="ibadge routed">Routed</span>
-              </div>
-            </div>
-            <div class="inbox-item" data-idx="6" onclick="selectInbox(6)">
-              <div class="inbox-icon-wrap sms"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 8.25h3m-3 3h3m-3 3h3"/></svg></div>
-              <div class="inbox-item-body">
-                <div class="inbox-item-row1"><span class="inbox-from">+1 702 555 4821</span><span class="inbox-time">5h</span></div>
-                <div class="inbox-preview">Quick question about the pricing tiers — do you offer monthly…</div>
-                <span class="ibadge done">Done</span>
-              </div>
-            </div>
-            <div class="inbox-item" data-idx="7" onclick="selectInbox(7)">
-              <div class="inbox-icon-wrap email"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg></div>
-              <div class="inbox-item-body">
-                <div class="inbox-item-row1"><span class="inbox-from">Chris M.</span><span class="inbox-time">7h</span></div>
-                <div class="inbox-preview">Following up from last week's discovery call — had a few more…</div>
-                <span class="ibadge done">Done</span>
-              </div>
-            </div>
           </div>
           <div class="inbox-detail glass" id="inbox-detail">
             <div class="inbox-empty-state">
@@ -1539,42 +1495,119 @@ body {
 
       <!-- ══ WORKFLOWS PAGE ══ -->
       <div class="page" id="page-workflows">
-        <div class="page-head" style="justify-content:space-between;margin-bottom:var(--gap)">
-          <div style="display:flex;align-items:center;gap:12px"><h2>Workflows</h2><span class="page-head-badge">3 active</span></div>
-          <button class="pbtn-primary" onclick="showToast('Workflow builder coming soon')">+ NEW WORKFLOW</button>
+        <!-- Grid view -->
+        <div id="wf-grid-view">
+          <div class="page-head" style="justify-content:space-between;margin-bottom:var(--gap)">
+            <div style="display:flex;align-items:center;gap:12px"><h2>Workflows</h2><span class="page-head-badge" id="wf-active-badge">3 active</span></div>
+            <button class="pbtn-primary" onclick="showWfBuilder()">+ NEW WORKFLOW</button>
+          </div>
+          <div class="wf-grid" id="wf-grid">
+            <div class="wf-card glass" data-wfid="wf0">
+              <div class="wf-card-head"><span class="wf-name">Lead Intake Pipeline</span><span class="wf-badge active" id="wf-badge-wf0">Active</span></div>
+              <div class="wf-meta"><span class="wf-meta-k">Trigger</span> Tally Form Submission</div>
+              <div class="wf-meta"><span class="wf-meta-k">Steps</span> 4 steps</div>
+              <div class="wf-meta"><span class="wf-meta-k">Last run</span> 2h ago</div>
+              <div class="wf-stats"><div><div class="wf-stat-v">12</div><div class="wf-stat-l">Runs today</div></div><div><div class="wf-stat-v" style="color:var(--green)">98%</div><div class="wf-stat-l">Success</div></div></div>
+              <div class="wf-btns"><button class="pbtn-ghost" onclick="showWfDetail('wf0')">VIEW WORKFLOW</button><button class="pbtn-amber wf-pause-btn" id="wf-pbtn-wf0" onclick="toggleWfPause('wf0',this)">PAUSE</button></div>
+            </div>
+            <div class="wf-card glass" data-wfid="wf1">
+              <div class="wf-card-head"><span class="wf-name">Email Acknowledgment</span><span class="wf-badge active" id="wf-badge-wf1">Active</span></div>
+              <div class="wf-meta"><span class="wf-meta-k">Trigger</span> Inbound Email</div>
+              <div class="wf-meta"><span class="wf-meta-k">Steps</span> 3 steps</div>
+              <div class="wf-meta"><span class="wf-meta-k">Last run</span> 41m ago</div>
+              <div class="wf-stats"><div><div class="wf-stat-v">8</div><div class="wf-stat-l">Runs today</div></div><div><div class="wf-stat-v" style="color:var(--green)">95%</div><div class="wf-stat-l">Success</div></div></div>
+              <div class="wf-btns"><button class="pbtn-ghost" onclick="showWfDetail('wf1')">VIEW WORKFLOW</button><button class="pbtn-amber wf-pause-btn" id="wf-pbtn-wf1" onclick="toggleWfPause('wf1',this)">PAUSE</button></div>
+            </div>
+            <div class="wf-card glass" data-wfid="wf2" style="opacity:0.7" id="wf-card-wf2">
+              <div class="wf-card-head"><span class="wf-name">Support Triage</span><span class="wf-badge paused" id="wf-badge-wf2">Paused</span></div>
+              <div class="wf-meta"><span class="wf-meta-k">Trigger</span> Inbound Email</div>
+              <div class="wf-meta"><span class="wf-meta-k">Steps</span> 5 steps</div>
+              <div class="wf-meta"><span class="wf-meta-k">Last run</span> 3h ago</div>
+              <div class="wf-stats"><div><div class="wf-stat-v" style="color:var(--text-dim)">0</div><div class="wf-stat-l">Runs today</div></div><div><div class="wf-stat-v" style="color:var(--green)">100%</div><div class="wf-stat-l">Success</div></div></div>
+              <div class="wf-btns"><button class="pbtn-ghost" onclick="showWfDetail('wf2')">VIEW WORKFLOW</button><button class="pbtn-green wf-pause-btn" id="wf-pbtn-wf2" onclick="toggleWfPause('wf2',this)">RESUME</button></div>
+            </div>
+            <div class="wf-card glass" data-wfid="wf3">
+              <div class="wf-card-head"><span class="wf-name">Daily Digest</span><span class="wf-badge active" id="wf-badge-wf3">Active</span></div>
+              <div class="wf-meta"><span class="wf-meta-k">Trigger</span> Scheduled · 07:00 PT</div>
+              <div class="wf-meta"><span class="wf-meta-k">Steps</span> 2 steps</div>
+              <div class="wf-meta"><span class="wf-meta-k">Last run</span> 7h ago</div>
+              <div class="wf-stats"><div><div class="wf-stat-v">1</div><div class="wf-stat-l">Runs today</div></div><div><div class="wf-stat-v" style="color:var(--green)">100%</div><div class="wf-stat-l">Success</div></div></div>
+              <div class="wf-btns"><button class="pbtn-ghost" onclick="showWfDetail('wf3')">VIEW WORKFLOW</button><button class="pbtn-amber wf-pause-btn" id="wf-pbtn-wf3" onclick="toggleWfPause('wf3',this)">PAUSE</button></div>
+            </div>
+          </div>
         </div>
-        <div class="wf-grid">
-          <div class="wf-card glass">
-            <div class="wf-card-head"><span class="wf-name">Lead Intake Pipeline</span><span class="wf-badge active">Active</span></div>
-            <div class="wf-meta"><span class="wf-meta-k">Trigger</span> Tally Form Submission</div>
-            <div class="wf-meta"><span class="wf-meta-k">Steps</span> 4 steps</div>
-            <div class="wf-meta"><span class="wf-meta-k">Last run</span> 2h ago</div>
-            <div class="wf-stats"><div><div class="wf-stat-v">12</div><div class="wf-stat-l">Runs today</div></div><div><div class="wf-stat-v" style="color:var(--green)">98%</div><div class="wf-stat-l">Success</div></div></div>
-            <div class="wf-btns"><button class="pbtn-ghost">VIEW</button><button class="pbtn-amber">PAUSE</button></div>
+
+        <!-- Detail view -->
+        <div id="wf-detail-view" style="display:none">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+            <button class="pbtn-ghost" onclick="hideWfDetail()" style="font-size:11px;padding:6px 14px">← BACK</button>
+            <h2 id="wfd-title" style="font-size:18px;font-weight:700"></h2>
+            <span id="wfd-badge" class="wf-badge active" style="margin-left:4px"></span>
           </div>
-          <div class="wf-card glass">
-            <div class="wf-card-head"><span class="wf-name">Email Acknowledgment</span><span class="wf-badge active">Active</span></div>
-            <div class="wf-meta"><span class="wf-meta-k">Trigger</span> Inbound Email</div>
-            <div class="wf-meta"><span class="wf-meta-k">Steps</span> 3 steps</div>
-            <div class="wf-meta"><span class="wf-meta-k">Last run</span> 41m ago</div>
-            <div class="wf-stats"><div><div class="wf-stat-v">8</div><div class="wf-stat-l">Runs today</div></div><div><div class="wf-stat-v" style="color:var(--green)">95%</div><div class="wf-stat-l">Success</div></div></div>
-            <div class="wf-btns"><button class="pbtn-ghost">VIEW</button><button class="pbtn-amber">PAUSE</button></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)">
+            <div class="glass" style="padding:20px;border-radius:var(--radius-md)">
+              <div style="font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:0.12em;color:var(--text-dim);margin-bottom:14px">WORKFLOW STEPS</div>
+              <div id="wfd-steps"></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:var(--gap)">
+              <div class="glass" style="padding:16px;border-radius:var(--radius-md)">
+                <div style="font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:0.12em;color:var(--text-dim);margin-bottom:10px">INFO</div>
+                <div id="wfd-meta" style="display:flex;flex-direction:column;gap:6px"></div>
+              </div>
+              <div class="glass" style="padding:16px;border-radius:var(--radius-md);flex:1">
+                <div style="font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:0.12em;color:var(--text-dim);margin-bottom:10px">RUN HISTORY</div>
+                <table style="width:100%;border-collapse:collapse;font-size:12px">
+                  <thead><tr style="border-bottom:1px solid var(--border)">
+                    <th style="text-align:left;padding:4px 8px;color:var(--text-dim);font-weight:600;font-family:var(--font-mono);font-size:9px">TIME</th>
+                    <th style="text-align:left;padding:4px 8px;color:var(--text-dim);font-weight:600;font-family:var(--font-mono);font-size:9px">STATUS</th>
+                    <th style="text-align:left;padding:4px 8px;color:var(--text-dim);font-weight:600;font-family:var(--font-mono);font-size:9px">DURATION</th>
+                  </tr></thead>
+                  <tbody id="wfd-runs"></tbody>
+                </table>
+              </div>
+            </div>
           </div>
-          <div class="wf-card glass" style="opacity:0.7">
-            <div class="wf-card-head"><span class="wf-name">Support Triage</span><span class="wf-badge paused">Paused</span></div>
-            <div class="wf-meta"><span class="wf-meta-k">Trigger</span> Inbound Email</div>
-            <div class="wf-meta"><span class="wf-meta-k">Steps</span> 5 steps</div>
-            <div class="wf-meta"><span class="wf-meta-k">Last run</span> 3h ago</div>
-            <div class="wf-stats"><div><div class="wf-stat-v" style="color:var(--text-dim)">0</div><div class="wf-stat-l">Runs today</div></div><div><div class="wf-stat-v" style="color:var(--green)">100%</div><div class="wf-stat-l">Success</div></div></div>
-            <div class="wf-btns"><button class="pbtn-ghost">VIEW</button><button class="pbtn-green">RESUME</button></div>
+        </div>
+
+        <!-- Builder panel -->
+        <div id="wf-builder-view" style="display:none">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+            <button class="pbtn-ghost" onclick="hideWfBuilder()" style="font-size:11px;padding:6px 14px">← CANCEL</button>
+            <h2 style="font-size:18px;font-weight:700">New Workflow</h2>
           </div>
-          <div class="wf-card glass">
-            <div class="wf-card-head"><span class="wf-name">Daily Digest</span><span class="wf-badge active">Active</span></div>
-            <div class="wf-meta"><span class="wf-meta-k">Trigger</span> Scheduled · 07:00 PT</div>
-            <div class="wf-meta"><span class="wf-meta-k">Steps</span> 2 steps</div>
-            <div class="wf-meta"><span class="wf-meta-k">Last run</span> 7h ago</div>
-            <div class="wf-stats"><div><div class="wf-stat-v">1</div><div class="wf-stat-l">Runs today</div></div><div><div class="wf-stat-v" style="color:var(--green)">100%</div><div class="wf-stat-l">Success</div></div></div>
-            <div class="wf-btns"><button class="pbtn-ghost">VIEW</button><button class="pbtn-amber">PAUSE</button></div>
+          <div class="glass" style="padding:24px;border-radius:var(--radius-md);max-width:560px">
+            <div style="margin-bottom:16px">
+              <label style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:0.1em;display:block;margin-bottom:6px">WORKFLOW NAME</label>
+              <input id="wfb-name" type="text" placeholder="e.g. Support Triage" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 14px;font-size:13px;color:var(--text-primary);font-family:var(--font-sans);outline:none"/>
+            </div>
+            <div style="margin-bottom:16px">
+              <label style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:0.1em;display:block;margin-bottom:6px">TRIGGER</label>
+              <select id="wfb-trigger" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 14px;font-size:13px;color:var(--text-muted);font-family:var(--font-sans);outline:none;cursor:pointer">
+                <option value="iMessage">iMessage</option>
+                <option value="Email">Email</option>
+                <option value="Slack">Slack</option>
+                <option value="Schedule">Schedule</option>
+              </select>
+            </div>
+            <div style="margin-bottom:20px">
+              <label style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:0.1em;display:block;margin-bottom:6px">STEPS</label>
+              <div id="wfb-steps-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px"></div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <select id="wfb-step-select" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 12px;font-size:12px;color:var(--text-muted);font-family:var(--font-sans);outline:none;cursor:pointer">
+                  <option value="Classify">Classify</option>
+                  <option value="Route">Route</option>
+                  <option value="Draft Reply">Draft Reply</option>
+                  <option value="Send">Send</option>
+                  <option value="Notify">Notify</option>
+                  <option value="Approve">Approve</option>
+                </select>
+                <button class="pbtn-ghost" onclick="wfbAddStep()" style="white-space:nowrap">+ ADD STEP</button>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px">
+              <button class="pbtn-primary" onclick="wfbSave()">SAVE WORKFLOW</button>
+              <button class="pbtn-ghost" onclick="hideWfBuilder()">CANCEL</button>
+            </div>
           </div>
         </div>
       </div>
@@ -1878,8 +1911,15 @@ body {
 .cust-add-btn { margin-left:auto; width:28px; height:28px; border-radius:50%; background:var(--accent-dim); border:1px solid rgba(79,110,247,0.3); color:var(--accent); font-size:18px; line-height:1; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:background 0.15s; }
 .cust-add-btn:hover { background:rgba(79,110,247,0.25); }
 
+/* ── INBOX TABS ── */
+.inbox-tab { font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:0.1em;padding:5px 12px;border-radius:20px;background:transparent;border:1px solid var(--border);color:var(--text-dim);cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:5px; }
+.inbox-tab:hover { background:var(--surface-hover);color:var(--text-muted); }
+.inbox-tab.active { background:var(--accent-dim);border-color:rgba(79,110,247,0.35);color:var(--accent); }
+.inbox-tab-badge { background:rgba(255,255,255,0.1);border-radius:10px;padding:1px 6px;font-size:9px; }
+.inbox-tab.active .inbox-tab-badge { background:rgba(79,110,247,0.25); }
+
 /* ── INBOX ── */
-.inbox-wrap { display:grid; grid-template-columns:40% 60%; gap:var(--gap); height:calc(100vh - 160px); }
+.inbox-wrap { display:grid; grid-template-columns:40% 60%; gap:var(--gap); height:calc(100vh - 200px); }
 .inbox-list { overflow-y:auto; display:flex; flex-direction:column; gap:4px; scrollbar-width:thin; scrollbar-color:rgba(255,255,255,0.08) transparent; }
 .inbox-item { padding:13px 14px; border-radius:var(--radius-md); background:var(--surface-deep); border:1px solid var(--border); cursor:pointer; transition:all 0.15s; display:flex; gap:12px; align-items:flex-start; }
 .inbox-item:hover { background:var(--surface); border-color:rgba(255,255,255,0.13); }
@@ -2075,11 +2115,22 @@ function navigateTo(pg) {
       setTimeout(() => { newPage.style.opacity = ''; newPage.style.transition = ''; }, 220);
     }));
     if (pg === 'logs') renderLogs();
+    if (pg === 'inbox') renderInbox();
+    if (pg !== 'logs') { logAgentFilter = null; const bar = document.getElementById('log-agent-filter-bar'); if (bar) bar.style.display = 'none'; }
   }, 155);
 }
 
 document.querySelectorAll('.nav-item[data-page]').forEach(item => {
   item.addEventListener('click', () => navigateTo(item.dataset.page));
+});
+
+// ── VIEW LOGS BUTTONS (Agents page) ──
+document.querySelectorAll('.btn-view-logs[data-agent]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const agent = btn.dataset.agent;
+    setLogAgentFilter(agent);
+    navigateTo('logs');
+  });
 });
 
 // ── SIDEBAR COLLAPSE ──
@@ -2263,15 +2314,29 @@ const LOG_ENTRIES = [
 ];
 
 let logFilter = 'all';
+let logAgentFilter = null;
 let autoscroll = true;
 
 function renderLogs() {
   const t = document.getElementById('terminal');
-  const rows = LOG_ENTRIES.filter(l => logFilter === 'all' || l.level === logFilter);
+  let rows = LOG_ENTRIES.filter(l => logFilter === 'all' || l.level === logFilter);
+  if (logAgentFilter) rows = rows.filter(l => l.agent === logAgentFilter);
   t.innerHTML = rows.map(l =>
     `<div class="log-row"><span class="l-ts">${l.ts}</span><span class="l-lvl ${l.level}">${l.level}</span><span class="l-agent">${l.agent}</span><span class="l-msg">${l.msg}</span></div>`
   ).join('');
   if (autoscroll) t.scrollTop = t.scrollHeight;
+}
+
+function setLogAgentFilter(agentName) {
+  logAgentFilter = agentName;
+  const bar = document.getElementById('log-agent-filter-bar');
+  bar.style.display = agentName ? 'flex' : 'none';
+  if (agentName) document.getElementById('log-agent-pill-name').textContent = agentName;
+  renderLogs();
+}
+
+function clearLogAgentFilter() {
+  setLogAgentFilter(null);
 }
 
 function setLogFilter(el, level) {
@@ -2494,18 +2559,81 @@ document.getElementById('customizer-backdrop').addEventListener('click', closeCu
 
 // ── INBOX ──
 const INBOX_DATA = [
-  { from:'Marcus T.', email:'marcus@example.com', ch:'Email', time:'Apr 1, 2026 – 8:04 AM', body:'Hi Jake,\n\nWanted to follow up on the Q2 proposal we discussed. The $8,400 enterprise package looks good to the team — we\'re close to a decision. Can we schedule a 30-minute call this week to go over the remaining questions?\n\nLooking forward to moving forward.', route:'sales · Email Operator', badge:'new' },
-  { from:'Sarah K.', email:'sarah@agencyhq.io', ch:'Tally Form', time:'Apr 1, 2026 – 7:50 AM', body:'Hi — I submitted the intake form. I run a small 6-person agency and we\'re overwhelmed with inbound lead coordination. Your OS Core system looks like exactly what we need. Would love to learn more about onboarding.\n\n— Sarah', route:'sales · Email Operator', badge:'routed' },
-  { from:'Daniel R.', email:'daniel@clientco.com', ch:'SMS', time:'Apr 1, 2026 – 7:37 AM', body:'Hey, just checking in on the support request I submitted last week. Still seeing the same issue with the integration — data isn\'t syncing properly after the last update. Ticket ref: #SUP-4421.', route:'support · Email Operator', badge:'approved' },
-  { from:'#ops-channel', email:'Slack · #ops-channel', ch:'Slack', time:'Apr 1, 2026 – 7:06 AM', body:'🔴 OPERATOR ERROR\nEmail send failed after 3 retries for action act_8bc1d2.\nAgent: Email Operator\nError: SMTP timeout after 30s\nStatus: Auto-retrying in 5 minutes…', route:'noise · System', badge:'done' },
-  { from:'Jennifer L.', email:'jennifer@ventures.co', ch:'Email', time:'Apr 1, 2026 – 6:02 AM', body:'Hello Jake,\n\nI\'ve been following your work on AI-driven ops for a while. We run a boutique investment firm and are looking for a partner to help automate our deal flow coordination. Would love to explore a partnership.\n\nBest,\nJennifer', route:'sales · Email Operator', badge:'new' },
-  { from:'Thomas B.', email:'thomas@clientb.io', ch:'Email', time:'Apr 1, 2026 – 5:06 AM', body:'Hi team,\n\nAfter the most recent deployment, our Supabase integration stopped returning data. The Postmark connector seems fine but the inbound event pipeline shows zero events since 3 AM. Can someone take a look?\n\nThomas', route:'support · Email Operator', badge:'routed' },
-  { from:'+1 702 555 4821', email:'+17025554821', ch:'SMS', time:'Apr 1, 2026 – 3:12 AM', body:'Quick question — do you offer monthly billing or is it annual only? Also wondering if there\'s a trial period before committing to the managed service.', route:'sales · SMS Operator', badge:'done' },
-  { from:'Chris M.', email:'chris@growthco.com', ch:'Email', time:'Apr 1, 2026 – 12:44 AM', body:'Hi Jake,\n\nFollowing up from last week\'s discovery call. Had a chance to review the proposal with our ops lead. We\'re ready to move forward — just need clarity on the onboarding timeline and SLA terms.\n\nThanks,\nChris', route:'sales · Email Operator', badge:'done' },
+  { from:'Marcus T.', email:'marcus@example.com', ch:'Email', time:'Apr 1, 2026 – 8:04 AM', body:'Hi Jake,\n\nWanted to follow up on the Q2 proposal we discussed. The $8,400 enterprise package looks good to the team — we\'re close to a decision. Can we schedule a 30-minute call this week to go over the remaining questions?\n\nLooking forward to moving forward.', route:'sales · Email Operator', badge:'new', tabStatus:'all', sortCh:'Email', sortTime:0 },
+  { from:'Sarah K.', email:'sarah@agencyhq.io', ch:'Tally Form', time:'Apr 1, 2026 – 7:50 AM', body:'Hi — I submitted the intake form. I run a small 6-person agency and we\'re overwhelmed with inbound lead coordination. Your OS Core system looks like exactly what we need. Would love to learn more about onboarding.\n\n— Sarah', route:'sales · Email Operator', badge:'routed', tabStatus:'all', sortCh:'Tally Form', sortTime:1 },
+  { from:'Daniel R.', email:'daniel@clientco.com', ch:'SMS', time:'Apr 1, 2026 – 7:37 AM', body:'Hey, just checking in on the support request I submitted last week. Still seeing the same issue with the integration — data isn\'t syncing properly after the last update. Ticket ref: #SUP-4421.', route:'support · Email Operator', badge:'approved', tabStatus:'all', sortCh:'SMS', sortTime:2 },
+  { from:'#ops-channel', email:'Slack · #ops-channel', ch:'Slack', time:'Apr 1, 2026 – 7:06 AM', body:'🔴 OPERATOR ERROR\nEmail send failed after 3 retries for action act_8bc1d2.\nAgent: Email Operator\nError: SMTP timeout after 30s\nStatus: Auto-retrying in 5 minutes…', route:'noise · System', badge:'done', tabStatus:'all', sortCh:'Slack', sortTime:3 },
+  { from:'Jennifer L.', email:'jennifer@ventures.co', ch:'Email', time:'Apr 1, 2026 – 6:02 AM', body:'Hello Jake,\n\nI\'ve been following your work on AI-driven ops for a while. We run a boutique investment firm and are looking for a partner to help automate our deal flow coordination. Would love to explore a partnership.\n\nBest,\nJennifer', route:'sales · Email Operator', badge:'new', tabStatus:'all', sortCh:'Email', sortTime:4 },
+  { from:'Thomas B.', email:'thomas@clientb.io', ch:'Email', time:'Apr 1, 2026 – 5:06 AM', body:'Hi team,\n\nAfter the most recent deployment, our Supabase integration stopped returning data. The Postmark connector seems fine but the inbound event pipeline shows zero events since 3 AM. Can someone take a look?\n\nThomas', route:'support · Email Operator', badge:'routed', tabStatus:'all', sortCh:'Email', sortTime:5 },
+  { from:'+1 702 555 4821', email:'+17025554821', ch:'SMS', time:'Apr 1, 2026 – 3:12 AM', body:'Quick question — do you offer monthly billing or is it annual only? Also wondering if there\'s a trial period before committing to the managed service.', route:'sales · SMS Operator', badge:'done', tabStatus:'all', sortCh:'SMS', sortTime:6 },
+  { from:'Chris M.', email:'chris@growthco.com', ch:'Email', time:'Apr 1, 2026 – 12:44 AM', body:'Hi Jake,\n\nFollowing up from last week\'s discovery call. Had a chance to review the proposal with our ops lead. We\'re ready to move forward — just need clarity on the onboarding timeline and SLA terms.\n\nThanks,\nChris', route:'sales · Email Operator', badge:'done', tabStatus:'all', sortCh:'Email', sortTime:7 },
 ];
 
-function selectInbox(idx) {
-  document.querySelectorAll('.inbox-item').forEach((el,i) => el.classList.toggle('selected', i===idx));
+let inboxTab = 'all';
+let selectedInboxIdx = null;
+
+function setInboxTab(tab) {
+  inboxTab = tab;
+  document.querySelectorAll('.inbox-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  renderInbox();
+}
+
+function renderInbox() {
+  const search = (document.getElementById('inbox-search')?.value || '').toLowerCase();
+  const sort = document.getElementById('inbox-sort')?.value || 'newest';
+  let items = INBOX_DATA.map((d, i) => ({ ...d, origIdx: i }));
+  // Tab filter
+  if (inboxTab === 'approved') items = items.filter(d => d.tabStatus === 'approved');
+  else if (inboxTab === 'rejected') items = items.filter(d => d.tabStatus === 'rejected');
+  // 'all' tab shows items not yet moved to approved/rejected
+  // Search filter
+  if (search) items = items.filter(d => d.from.toLowerCase().includes(search) || d.body.toLowerCase().includes(search));
+  // Sort
+  if (sort === 'oldest') items.sort((a,b) => b.sortTime - a.sortTime);
+  else if (sort === 'channel') items.sort((a,b) => a.sortCh.localeCompare(b.sortCh));
+  else if (sort === 'status') items.sort((a,b) => a.badge.localeCompare(b.badge));
+  else items.sort((a,b) => a.sortTime - b.sortTime); // newest first
+  // Update tab counts
+  document.getElementById('itab-all').textContent = INBOX_DATA.filter(d => d.tabStatus === 'all').length;
+  document.getElementById('itab-approved').textContent = INBOX_DATA.filter(d => d.tabStatus === 'approved').length;
+  document.getElementById('itab-rejected').textContent = INBOX_DATA.filter(d => d.tabStatus === 'rejected').length;
+  // Channel icon helper
+  const chIcon = ch => {
+    if (ch === 'Email' || ch === 'Tally Form') return `<div class="inbox-icon-wrap email"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg></div>`;
+    if (ch === 'SMS') return `<div class="inbox-icon-wrap sms"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 8.25h3m-3 3h3m-3 3h3"/></svg></div>`;
+    return `<div class="inbox-icon-wrap slack"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg></div>`;
+  };
+  const list = document.getElementById('inbox-list');
+  if (items.length === 0) {
+    list.innerHTML = `<div style="padding:40px;text-align:center;color:var(--text-dim);font-size:13px">No items</div>`;
+    return;
+  }
+  list.innerHTML = items.map(d => `
+    <div class="inbox-item${d.origIdx === selectedInboxIdx ? ' selected' : ''}${d.badge === 'new' || d.badge === 'routed' ? ' unread' : ''}" onclick="selectInbox(${d.origIdx},this)">
+      ${chIcon(d.ch)}
+      <div class="inbox-item-body">
+        <div class="inbox-item-row1"><span class="inbox-from">${d.from}</span><span class="inbox-time">${d.sortTime === 0 ? '4m' : d.sortTime === 1 ? '18m' : d.sortTime === 2 ? '31m' : d.sortTime === 3 ? '1h' : d.sortTime === 4 ? '2h' : d.sortTime === 5 ? '3h' : d.sortTime === 6 ? '5h' : '7h'}</span></div>
+        <div class="inbox-preview">${d.body.split('\n')[0].slice(0,70)}…</div>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+          <span class="ibadge ${d.badge}">${d.badge.charAt(0).toUpperCase()+d.badge.slice(1)}</span>
+          ${d.tabStatus === 'all' ? `<button onclick="event.stopPropagation();inboxAction(${d.origIdx},'approved')" style="font-family:var(--font-mono);font-size:9px;padding:2px 8px;border-radius:10px;background:var(--green-dim);border:1px solid rgba(0,255,136,0.3);color:var(--green);cursor:pointer">✓ APPROVE</button><button onclick="event.stopPropagation();inboxAction(${d.origIdx},'rejected')" style="font-family:var(--font-mono);font-size:9px;padding:2px 8px;border-radius:10px;background:var(--red-dim);border:1px solid rgba(255,68,68,0.3);color:var(--red);cursor:pointer">✗ REJECT</button>` : ''}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function inboxAction(origIdx, action) {
+  INBOX_DATA[origIdx].tabStatus = action;
+  if (action === 'approved') INBOX_DATA[origIdx].badge = 'approved';
+  if (action === 'rejected') INBOX_DATA[origIdx].badge = 'done';
+  renderInbox();
+  showToast(action === 'approved' ? 'Item approved' : 'Item rejected');
+}
+
+function selectInbox(idx, el) {
+  selectedInboxIdx = idx;
+  document.querySelectorAll('.inbox-item').forEach(i => i.classList.remove('selected'));
+  if (el) el.classList.add('selected');
   const d = INBOX_DATA[idx];
   const detail = document.getElementById('inbox-detail');
   detail.innerHTML = `
@@ -2514,10 +2642,148 @@ function selectInbox(idx) {
 <div class="detail-body-card" style="white-space:pre-wrap">${d.body}</div>
 <div class="detail-route"><div class="detail-route-lbl">ROUTED TO</div><div class="detail-route-val">${d.route}</div></div>
 <div class="detail-btns">
-  <button class="pbtn-primary" onclick="showToast('Draft approved and queued for send')">APPROVE DRAFT</button>
-  <button class="pbtn-ghost" style="color:var(--red);border-color:rgba(255,68,68,0.3)" onclick="showToast('Draft rejected')">REJECT</button>
+  <button class="pbtn-primary" onclick="inboxAction(${idx},'approved');showToast('Draft approved and queued for send')">APPROVE DRAFT</button>
+  <button class="pbtn-ghost" style="color:var(--red);border-color:rgba(255,68,68,0.3)" onclick="inboxAction(${idx},'rejected')">REJECT</button>
   <button class="pbtn-ghost" onclick="navigateTo('logs')">VIEW IN LOGS</button>
 </div>`;
+}
+
+// ── WORKFLOWS ──
+const wfPaused = { wf2: true };
+const WF_DATA = {
+  wf0: { name:'Lead Intake Pipeline', trigger:'Tally Form Submission', lastRun:'2h ago', steps:[
+    { icon:'📥', label:'Receive Tally form submission' },
+    { icon:'🔍', label:'Gatekeeper: deduplicate & normalize' },
+    { icon:'🗂️', label:'Router: classify → sales bucket' },
+    { icon:'✉️', label:'Operator: draft acknowledgment email' },
+  ]},
+  wf1: { name:'Email Acknowledgment', trigger:'Inbound Email', lastRun:'41m ago', steps:[
+    { icon:'📧', label:'Receive inbound email via Postmark' },
+    { icon:'🔍', label:'Gatekeeper: deduplicate & normalize' },
+    { icon:'✉️', label:'Operator: draft & queue reply' },
+  ]},
+  wf2: { name:'Support Triage', trigger:'Inbound Email', lastRun:'3h ago', steps:[
+    { icon:'📧', label:'Receive support email' },
+    { icon:'🔍', label:'Gatekeeper: deduplicate & normalize' },
+    { icon:'🗂️', label:'Router: classify → support bucket' },
+    { icon:'📋', label:'Operator: create support ticket note' },
+    { icon:'✅', label:'Approval: send SLA response (high-risk)' },
+  ]},
+  wf3: { name:'Daily Digest', trigger:'Scheduled · 07:00 PT', lastRun:'7h ago', steps:[
+    { icon:'⏰', label:'Scheduler fires at 07:00 PT' },
+    { icon:'📊', label:'Reporter: compile 24h digest & send' },
+  ]},
+};
+const WF_RUNS = [
+  ['Apr 2, 2026 · 08:02 AM','✅ Success','1.2s'],
+  ['Apr 1, 2026 · 02:14 PM','✅ Success','980ms'],
+  ['Apr 1, 2026 · 11:47 AM','⚠️ Warning','2.1s'],
+  ['Apr 1, 2026 · 09:30 AM','✅ Success','1.1s'],
+  ['Mar 31, 2026 · 06:52 PM','❌ Failed','—'],
+];
+
+function toggleWfPause(id, btn) {
+  wfPaused[id] = !wfPaused[id];
+  const paused = wfPaused[id];
+  const badge = document.getElementById('wf-badge-' + id);
+  const card = document.querySelector(`[data-wfid="${id}"]`);
+  if (badge) {
+    badge.textContent = paused ? 'Paused' : 'Active';
+    badge.className = 'wf-badge ' + (paused ? 'paused' : 'active');
+  }
+  if (card) card.style.opacity = paused ? '0.7' : '1';
+  btn.textContent = paused ? 'RESUME' : 'PAUSE';
+  btn.className = paused ? 'pbtn-green wf-pause-btn' : 'pbtn-amber wf-pause-btn';
+  // update active count badge
+  const activeCount = Object.values(wfPaused).filter(v => v).length;
+  const total = document.querySelectorAll('#wf-grid .wf-card').length;
+  const activeBadge = document.getElementById('wf-active-badge');
+  if (activeBadge) activeBadge.textContent = (total - activeCount) + ' active';
+  showToast(paused ? 'Workflow paused' : 'Workflow resumed');
+}
+
+function showWfDetail(id) {
+  const d = WF_DATA[id];
+  if (!d) return;
+  document.getElementById('wf-grid-view').style.display = 'none';
+  document.getElementById('wf-builder-view').style.display = 'none';
+  const dv = document.getElementById('wf-detail-view');
+  dv.style.display = 'block';
+  document.getElementById('wfd-title').textContent = d.name;
+  const badge = document.getElementById('wfd-badge');
+  badge.textContent = wfPaused[id] ? 'Paused' : 'Active';
+  badge.className = 'wf-badge ' + (wfPaused[id] ? 'paused' : 'active');
+  document.getElementById('wfd-steps').innerHTML = d.steps.map((s,i) => `
+    <div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;${i < d.steps.length-1 ? 'border-bottom:1px solid var(--border)' : ''}">
+      <div style="width:28px;height:28px;border-radius:8px;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px">${s.icon}</div>
+      <div style="display:flex;align-items:center;gap:8px;flex:1">
+        <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);width:18px;flex-shrink:0">${i+1}.</span>
+        <span style="font-size:13px;color:var(--text-primary)">${s.label}</span>
+      </div>
+    </div>`).join('');
+  document.getElementById('wfd-meta').innerHTML = [
+    ['Trigger', d.trigger],
+    ['Steps', d.steps.length + ' steps'],
+    ['Last run', d.lastRun],
+    ['Status', wfPaused[id] ? 'Paused' : 'Active'],
+  ].map(([k,v]) => `<div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--text-dim)">${k}</span><span style="color:var(--text-primary)">${v}</span></div>`).join('');
+  document.getElementById('wfd-runs').innerHTML = WF_RUNS.map(r => `
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.04)">
+      <td style="padding:6px 8px;color:var(--text-muted);font-family:var(--font-mono);font-size:10px">${r[0]}</td>
+      <td style="padding:6px 8px;font-size:11px">${r[1]}</td>
+      <td style="padding:6px 8px;color:var(--text-dim);font-family:var(--font-mono);font-size:10px">${r[2]}</td>
+    </tr>`).join('');
+}
+
+function hideWfDetail() {
+  document.getElementById('wf-detail-view').style.display = 'none';
+  document.getElementById('wf-grid-view').style.display = 'block';
+}
+
+let wfbSteps = [];
+function showWfBuilder() {
+  wfbSteps = [];
+  document.getElementById('wfb-name').value = '';
+  document.getElementById('wfb-steps-list').innerHTML = '';
+  document.getElementById('wf-grid-view').style.display = 'none';
+  document.getElementById('wf-detail-view').style.display = 'none';
+  document.getElementById('wf-builder-view').style.display = 'block';
+}
+function hideWfBuilder() {
+  document.getElementById('wf-builder-view').style.display = 'none';
+  document.getElementById('wf-grid-view').style.display = 'block';
+}
+function wfbAddStep() {
+  const sel = document.getElementById('wfb-step-select').value;
+  wfbSteps.push(sel);
+  const list = document.getElementById('wfb-steps-list');
+  const idx = wfbSteps.length - 1;
+  const div = document.createElement('div');
+  div.style.cssText = 'display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)';
+  div.innerHTML = `<span style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);width:18px">${idx+1}.</span><span style="flex:1;font-size:13px;color:var(--text-primary)">${sel}</span><button onclick="this.parentElement.remove();wfbSteps.splice(${idx},1)" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:16px;padding:0">×</button>`;
+  list.appendChild(div);
+}
+function wfbSave() {
+  const name = document.getElementById('wfb-name').value.trim();
+  if (!name) { showToast('Enter a workflow name'); return; }
+  const trigger = document.getElementById('wfb-trigger').value;
+  const newId = 'wf' + Date.now();
+  // Add card to grid
+  const grid = document.getElementById('wf-grid');
+  const card = document.createElement('div');
+  card.className = 'wf-card glass';
+  card.dataset.wfid = newId;
+  card.innerHTML = `
+    <div class="wf-card-head"><span class="wf-name">${name}</span><span class="wf-badge active" id="wf-badge-${newId}">Active</span></div>
+    <div class="wf-meta"><span class="wf-meta-k">Trigger</span> ${trigger}</div>
+    <div class="wf-meta"><span class="wf-meta-k">Steps</span> ${wfbSteps.length} steps</div>
+    <div class="wf-meta"><span class="wf-meta-k">Last run</span> Never</div>
+    <div class="wf-stats"><div><div class="wf-stat-v">0</div><div class="wf-stat-l">Runs today</div></div><div><div class="wf-stat-v" style="color:var(--text-dim)">—</div><div class="wf-stat-l">Success</div></div></div>
+    <div class="wf-btns"><button class="pbtn-ghost" onclick="showWfDetail('${newId}')">VIEW WORKFLOW</button><button class="pbtn-amber wf-pause-btn" id="wf-pbtn-${newId}" onclick="toggleWfPause('${newId}',this)">PAUSE</button></div>`;
+  grid.appendChild(card);
+  WF_DATA[newId] = { name, trigger, lastRun:'Never', steps: wfbSteps.map(s => ({ icon:'⚙️', label:s })) };
+  hideWfBuilder();
+  showToast(`Workflow "${name}" created`);
 }
 
 // ── APPROVALS PAGE HANDLERS ──
@@ -2583,6 +2849,9 @@ function resetAppearance() {
   document.querySelectorAll('.tbtn').forEach((b,i) => b.classList.toggle('active', i===0));
   showToast('Appearance reset to defaults');
 }
+
+// ── INIT ──
+renderInbox();
 </script>
 </body>
 </html>
