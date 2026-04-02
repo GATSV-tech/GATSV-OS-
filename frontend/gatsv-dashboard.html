@@ -1201,7 +1201,7 @@ body {
         <div class="bento">
 
           <!-- [2x2] System Overview -->
-          <div class="widget glass w-sys" data-expand-id="sys" data-expand-title="System Overview">
+          <div class="widget glass w-sys" draggable="true" data-expand-id="sys" data-expand-title="System Overview">
             <div class="widget-label">
               <span>GATSV OS</span>
             </div>
@@ -1217,14 +1217,14 @@ body {
           </div>
 
           <!-- [1x1] Requests Today -->
-          <div class="widget glass w-req" data-expand-id="req" data-expand-title="Requests Today">
+          <div class="widget glass w-req" draggable="true" data-expand-id="req" data-expand-title="Requests Today">
             <div class="kpi-lbl">Requests Today</div>
             <div class="kpi-num" id="kpi-req">47</div>
             <div class="kpi-trend">↑ 12% vs yesterday</div>
           </div>
 
           <!-- [1x1] Pending Approvals -->
-          <div class="widget glass w-appr" style="position:relative" data-expand-id="appr" data-expand-title="Pending Approvals">
+          <div class="widget glass w-appr" draggable="true" style="position:relative" data-expand-id="appr" data-expand-title="Pending Approvals">
             <div class="appr-dot"></div>
             <div class="kpi-lbl">Need Review</div>
             <div class="kpi-num" id="kpi-appr" style="color:var(--amber)">7</div>
@@ -1232,27 +1232,27 @@ body {
           </div>
 
           <!-- [1x1] Completed -->
-          <div class="widget glass w-comp" data-expand-id="comp" data-expand-title="Completed">
+          <div class="widget glass w-comp" draggable="true" data-expand-id="comp" data-expand-title="Completed">
             <div class="kpi-lbl">Completed</div>
             <div class="kpi-num" style="color:var(--green)">38</div>
             <div class="kpi-trend">↑ 8% vs yesterday</div>
           </div>
 
           <!-- [1x1] Avg Response -->
-          <div class="widget glass w-resp" data-expand-id="resp" data-expand-title="Avg Response Time">
+          <div class="widget glass w-resp" draggable="true" data-expand-id="resp" data-expand-title="Avg Response Time">
             <div class="kpi-lbl">Avg Response</div>
             <div class="kpi-num">2.4<span style="font-size:18px;font-weight:400;color:var(--text-muted)">m</span></div>
             <div class="kpi-trend down">↓ −0.3m vs yesterday</div>
           </div>
 
           <!-- [2x1] Chart -->
-          <div class="widget glass w-chart" data-expand-id="chart" data-expand-title="Request Volume">
+          <div class="widget glass w-chart" draggable="true" data-expand-id="chart" data-expand-title="Request Volume">
             <div class="widget-label">Request Volume — Last 7 Days</div>
             <div class="chart-canvas-wrap"><canvas id="volumeChart"></canvas></div>
           </div>
 
           <!-- [2x2] Activity Feed -->
-          <div class="widget glass w-feed" data-expand-id="feed" data-expand-title="Live Activity">
+          <div class="widget glass w-feed" draggable="true" data-expand-id="feed" data-expand-title="Live Activity">
             <div class="feed-header">
               <div class="widget-label" style="margin-bottom:0">
                 <div class="live-dot"></div>
@@ -1263,7 +1263,7 @@ body {
           </div>
 
           <!-- [1x2] Approval Queue -->
-          <div class="widget glass w-queue" data-expand-id="queue" data-expand-title="Approval Queue">
+          <div class="widget glass w-queue" draggable="true" data-expand-id="queue" data-expand-title="Approval Queue">
             <div class="widget-label" style="justify-content:space-between">
               <span>APPROVALS</span>
               <span class="queue-count" id="queue-count">7 pending</span>
@@ -1312,7 +1312,7 @@ body {
           </div>
 
           <!-- [2x1] Active Operators -->
-          <div class="widget glass w-ops" data-expand-id="ops" data-expand-title="Active Operators">
+          <div class="widget glass w-ops" draggable="true" data-expand-id="ops" data-expand-title="Active Operators">
             <div class="widget-label">Active Operators</div>
             <div class="op-row">
               <div class="status-dot-sm green"></div>
@@ -1744,14 +1744,7 @@ body {
             <!-- Integrations -->
             <div class="settings-section" id="ss-integrations">
               <div class="scard glass"><h3>CONNECTED INTEGRATIONS</h3>
-                <div class="integ-grid">
-                  <div class="integ-card"><div class="integ-icon">⚡</div><div class="integ-name">Slack</div><div class="integ-status connected">● Connected</div><button class="pbtn-ghost" style="font-size:9px;padding:5px 12px" onclick="showToast('Disconnected Slack')">DISCONNECT</button></div>
-                  <div class="integ-card"><div class="integ-icon">📧</div><div class="integ-name">Postmark</div><div class="integ-status connected">● Connected</div><button class="pbtn-ghost" style="font-size:9px;padding:5px 12px" onclick="showToast('Disconnected Postmark')">DISCONNECT</button></div>
-                  <div class="integ-card"><div class="integ-icon">💬</div><div class="integ-name">Sendblue</div><div class="integ-status connected">● Connected</div><button class="pbtn-ghost" style="font-size:9px;padding:5px 12px" onclick="showToast('Disconnected Sendblue')">DISCONNECT</button></div>
-                  <div class="integ-card"><div class="integ-icon">🗄</div><div class="integ-name">Supabase</div><div class="integ-status connected">● Connected</div><button class="pbtn-ghost" style="font-size:9px;padding:5px 12px" onclick="showToast('Disconnected Supabase')">DISCONNECT</button></div>
-                  <div class="integ-card"><div class="integ-icon">🐙</div><div class="integ-name">GitHub</div><div class="integ-status">● Not connected</div><button class="pbtn-primary" style="font-size:9px;padding:5px 12px" onclick="showToast('GitHub OAuth coming soon')">CONNECT</button></div>
-                  <div class="integ-card"><div class="integ-icon">📝</div><div class="integ-name">Notion</div><div class="integ-status">● Not connected</div><button class="pbtn-primary" style="font-size:9px;padding:5px 12px" onclick="showToast('Notion OAuth coming soon')">CONNECT</button></div>
-                </div>
+                <div class="integ-grid" id="integ-grid"></div>
               </div>
             </div>
 
@@ -1861,6 +1854,37 @@ body {
   </div>
 </div>
 <div id="customizer-backdrop" style="display:none;position:fixed;inset:0;z-index:440"></div>
+
+<!-- ══ INTEGRATION MODAL ══ -->
+<div id="integ-modal-backdrop" style="display:none;position:fixed;inset:0;background:rgba(5,5,8,0.75);z-index:600;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)" onclick="closeIntegModal()">
+  <div id="integ-modal" onclick="event.stopPropagation()" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:400px;background:rgba(14,14,22,0.97);border:1px solid rgba(255,255,255,0.13);border-radius:20px;box-shadow:0 24px 80px rgba(0,0,0,0.7);padding:28px;font-family:var(--font-sans)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div>
+        <div id="integ-modal-title" style="font-size:15px;font-weight:700;color:var(--text-primary)"></div>
+        <div id="integ-modal-sub" style="font-size:11px;color:var(--text-dim);margin-top:3px"></div>
+      </div>
+      <button onclick="closeIntegModal()" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:20px;padding:0;line-height:1">×</button>
+    </div>
+    <!-- Connect form -->
+    <div id="integ-modal-connect-form">
+      <label style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:0.1em;display:block;margin-bottom:6px">API KEY / TOKEN</label>
+      <input id="integ-modal-input" type="password" placeholder="Paste your API key or token…"
+        style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 14px;font-size:13px;color:var(--text-primary);font-family:var(--font-sans);outline:none;margin-bottom:16px"/>
+      <div style="display:flex;gap:10px">
+        <button class="pbtn-primary" onclick="confirmIntegConnect()" style="flex:1">CONNECT</button>
+        <button class="pbtn-ghost" onclick="closeIntegModal()">CANCEL</button>
+      </div>
+    </div>
+    <!-- Disconnect confirm -->
+    <div id="integ-modal-disconnect-form" style="display:none">
+      <div id="integ-modal-disconnect-msg" style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:20px"></div>
+      <div style="display:flex;gap:10px">
+        <button class="pbtn-ghost" style="color:var(--red);border-color:rgba(255,68,68,0.3);flex:1" onclick="confirmIntegDisconnect()">DISCONNECT</button>
+        <button class="pbtn-ghost" onclick="closeIntegModal()">CANCEL</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <style>
 /* Small status dot helper */
@@ -2554,33 +2578,50 @@ document.querySelectorAll('.widget[data-expand-id]').forEach(attachExpandEvent);
 
 // ── DRAG & DROP BENTO ──
 let dragSrc = null;
+function swapWidgets(a, b) {
+  const parent = a.parentNode;
+  const aNext = a.nextSibling;
+  const bNext = b.nextSibling;
+  if (bNext === a) {
+    parent.insertBefore(a, b);
+  } else if (aNext === b) {
+    parent.insertBefore(b, a);
+  } else {
+    parent.insertBefore(b, aNext);
+    parent.insertBefore(a, bNext);
+  }
+}
 function attachDragEvents(el) {
   el.draggable = true;
   el.addEventListener('dragstart', e => {
     dragSrc = el;
-    el.classList.add('dragging');
     e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', ''); // required for Firefox
+    // Delay adding class so ghost image captures clean state
+    setTimeout(() => el.classList.add('dragging'), 0);
   });
   el.addEventListener('dragend', () => {
-    el.classList.remove('dragging');
-    document.querySelectorAll('.widget').forEach(w => w.classList.remove('drag-over'));
+    document.querySelectorAll('.widget').forEach(w => {
+      w.classList.remove('dragging');
+      w.classList.remove('drag-over');
+    });
     dragSrc = null;
   });
   el.addEventListener('dragover', e => {
-    e.preventDefault();
-    if (el !== dragSrc) el.classList.add('drag-over');
+    e.preventDefault(); // REQUIRED — allows drop
+    e.dataTransfer.dropEffect = 'move';
+    if (dragSrc && el !== dragSrc) el.classList.add('drag-over');
   });
-  el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+  el.addEventListener('dragleave', e => {
+    // Only remove if leaving the widget entirely (not entering a child)
+    if (!el.contains(e.relatedTarget)) el.classList.remove('drag-over');
+  });
   el.addEventListener('drop', e => {
     e.preventDefault();
+    e.stopPropagation();
     el.classList.remove('drag-over');
     if (!dragSrc || dragSrc === el) return;
-    const bento = document.querySelector('.bento');
-    const children = [...bento.children];
-    const srcIdx = children.indexOf(dragSrc);
-    const tgtIdx = children.indexOf(el);
-    if (srcIdx < tgtIdx) bento.insertBefore(dragSrc, el.nextSibling);
-    else bento.insertBefore(dragSrc, el);
+    swapWidgets(dragSrc, el);
   });
 }
 document.querySelectorAll('.bento .widget').forEach(attachDragEvents);
@@ -2898,6 +2939,96 @@ function handleApprPage(btn) {
     document.getElementById('atab-deferred').textContent = apprArchive.deferred.length;
   }, 300);
 }
+
+// ── INTEGRATIONS ──
+const INTEG_META = [
+  { key:'slack',    icon:'⚡', name:'Slack',    hint:'Bot token (xoxb-…)' },
+  { key:'postmark', icon:'📧', name:'Postmark', hint:'Server API token' },
+  { key:'sendblue', icon:'💬', name:'Sendblue', hint:'API key' },
+  { key:'supabase', icon:'🗄', name:'Supabase', hint:'Service role key' },
+  { key:'github',   icon:'🐙', name:'GitHub',   hint:'Personal access token' },
+  { key:'notion',   icon:'📝', name:'Notion',   hint:'Integration token' },
+];
+const integrationState = { slack:true, postmark:true, sendblue:true, supabase:true, github:false, notion:false };
+let integModalKey = null;
+let integModalMode = null; // 'connect' | 'disconnect'
+
+function renderIntegGrid() {
+  const grid = document.getElementById('integ-grid');
+  if (!grid) return;
+  grid.innerHTML = INTEG_META.map(m => {
+    const connected = integrationState[m.key];
+    return `<div class="integ-card" id="integ-card-${m.key}">
+      <div class="integ-icon">${m.icon}</div>
+      <div class="integ-name">${m.name}</div>
+      <div class="integ-status${connected ? ' connected' : ''}">● ${connected ? 'Connected' : 'Not connected'}</div>
+      ${connected
+        ? `<button class="pbtn-ghost" style="font-size:9px;padding:5px 12px" onclick="openIntegDisconnect('${m.key}')">DISCONNECT</button>`
+        : `<button class="pbtn-primary" style="font-size:9px;padding:5px 12px" onclick="openIntegConnect('${m.key}')">CONNECT</button>`}
+    </div>`;
+  }).join('');
+}
+
+function openIntegConnect(key) {
+  const meta = INTEG_META.find(m => m.key === key);
+  integModalKey = key;
+  integModalMode = 'connect';
+  document.getElementById('integ-modal-title').textContent = 'Connect ' + meta.name;
+  document.getElementById('integ-modal-sub').textContent = meta.hint;
+  document.getElementById('integ-modal-input').value = '';
+  document.getElementById('integ-modal-connect-form').style.display = 'block';
+  document.getElementById('integ-modal-disconnect-form').style.display = 'none';
+  document.getElementById('integ-modal-backdrop').style.display = 'block';
+  setTimeout(() => document.getElementById('integ-modal-input').focus(), 50);
+}
+
+function openIntegDisconnect(key) {
+  const meta = INTEG_META.find(m => m.key === key);
+  integModalKey = key;
+  integModalMode = 'disconnect';
+  document.getElementById('integ-modal-title').textContent = 'Disconnect ' + meta.name;
+  document.getElementById('integ-modal-sub').textContent = '';
+  document.getElementById('integ-modal-disconnect-msg').textContent =
+    `Disconnect ${meta.name}? This will stop all activity using this integration.`;
+  document.getElementById('integ-modal-connect-form').style.display = 'none';
+  document.getElementById('integ-modal-disconnect-form').style.display = 'block';
+  document.getElementById('integ-modal-backdrop').style.display = 'block';
+}
+
+function confirmIntegConnect() {
+  const val = document.getElementById('integ-modal-input').value.trim();
+  if (!val) {
+    document.getElementById('integ-modal-input').style.borderColor = 'var(--red)';
+    setTimeout(() => document.getElementById('integ-modal-input').style.borderColor = '', 1200);
+    return;
+  }
+  integrationState[integModalKey] = true;
+  renderIntegGrid();
+  closeIntegModal();
+  const meta = INTEG_META.find(m => m.key === integModalKey);
+  showToast(meta.name + ' connected');
+}
+
+function confirmIntegDisconnect() {
+  integrationState[integModalKey] = false;
+  renderIntegGrid();
+  closeIntegModal();
+  const meta = INTEG_META.find(m => m.key === integModalKey);
+  showToast(meta.name + ' disconnected');
+}
+
+function closeIntegModal() {
+  document.getElementById('integ-modal-backdrop').style.display = 'none';
+  integModalKey = null;
+  integModalMode = null;
+}
+
+// Close on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeIntegModal();
+});
+
+renderIntegGrid();
 
 // ── SETTINGS ──
 function switchSettings(el, sec) {
