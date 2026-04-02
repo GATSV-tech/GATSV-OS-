@@ -42,7 +42,8 @@
 }
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden}
+html{height:100%;overflow:hidden;background:#050508}
+body{height:100%;overflow:hidden}
 
 body {
   background:
@@ -285,6 +286,9 @@ body {
   padding: 0 20px;
   gap: 16px;
   flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+  isolation: isolate;
 }
 .header-title {
   font-family: var(--font-mono);
@@ -324,7 +328,7 @@ body {
   width: 14px;
   height: 14px;
 }
-.header-right { margin-left: auto; display: flex; align-items: center; gap: 12px; position: relative; }
+.header-right { margin-left: auto; display: flex; align-items: center; gap: 12px; position: relative; z-index: 999; }
 .icon-btn {
   width: 36px;
   height: 36px;
@@ -439,10 +443,6 @@ body {
   -webkit-backdrop-filter: var(--blur);
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
-  /* Animated background gradient */
-  background-image:
-    radial-gradient(ellipse 70% 50% at 20% 80%, rgba(79,110,247,0.12) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 40% at 80% 20%, rgba(0,255,136,0.06) 0%, transparent 50%);
 }
 .sys-time {
   font-family: var(--font-mono);
@@ -964,7 +964,7 @@ body {
   border: 1px solid rgba(255,255,255,0.11);
   border-radius: 16px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.65);
-  z-index: 600;
+  z-index: 1000;
   overflow: hidden;
   animation: ddropIn 0.15s ease;
 }
@@ -1024,7 +1024,7 @@ body {
   border: 1px solid rgba(255,255,255,0.11);
   border-radius: 14px;
   box-shadow: 0 16px 50px rgba(0,0,0,0.6);
-  z-index: 600;
+  z-index: 1000;
   overflow: hidden;
   animation: ddropIn 0.15s ease;
 }
@@ -1823,12 +1823,12 @@ body {
     </div>
     <div style="font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:0.15em;color:var(--text-dim);margin:24px 0 12px">ADD WIDGETS</div>
     <div class="cust-list">
-      <div class="cust-item"><span class="cust-name" style="color:var(--text-muted)">CPU Usage</span><button class="cust-add-btn" onclick="showToast('CPU Usage widget added')">+</button></div>
-      <div class="cust-item"><span class="cust-name" style="color:var(--text-muted)">Memory Usage</span><button class="cust-add-btn" onclick="showToast('Memory Usage widget added')">+</button></div>
-      <div class="cust-item"><span class="cust-name" style="color:var(--text-muted)">Cost Today</span><button class="cust-add-btn" onclick="showToast('Cost Today widget added')">+</button></div>
-      <div class="cust-item"><span class="cust-name" style="color:var(--text-muted)">Error Rate</span><button class="cust-add-btn" onclick="showToast('Error Rate widget added')">+</button></div>
-      <div class="cust-item"><span class="cust-name" style="color:var(--text-muted)">Queue Depth</span><button class="cust-add-btn" onclick="showToast('Queue Depth widget added')">+</button></div>
-      <div class="cust-item"><span class="cust-name" style="color:var(--text-muted)">Agent Uptime</span><button class="cust-add-btn" onclick="showToast('Agent Uptime widget added')">+</button></div>
+      <div class="cust-item"><span class="cust-name" style="color:var(--text-muted)">CPU Usage</span><button class="cust-add-btn" onclick="addWidget('CPU Usage')">+</button></div>
+      <div class="cust-item"><span class="cust-name" style="color:var(--text-muted)">Memory Usage</span><button class="cust-add-btn" onclick="addWidget('Memory Usage')">+</button></div>
+      <div class="cust-item"><span class="cust-name" style="color:var(--text-muted)">Cost Today</span><button class="cust-add-btn" onclick="addWidget('Cost Today')">+</button></div>
+      <div class="cust-item"><span class="cust-name" style="color:var(--text-muted)">Error Rate</span><button class="cust-add-btn" onclick="addWidget('Error Rate')">+</button></div>
+      <div class="cust-item"><span class="cust-name" style="color:var(--text-muted)">Queue Depth</span><button class="cust-add-btn" onclick="addWidget('Queue Depth')">+</button></div>
+      <div class="cust-item"><span class="cust-name" style="color:var(--text-muted)">Agent Uptime</span><button class="cust-add-btn" onclick="addWidget('Agent Uptime')">+</button></div>
     </div>
     <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-dim);margin-top:24px;text-align:center">Drag to reorder · Changes save automatically</div>
   </div>
@@ -2294,6 +2294,33 @@ function toggleAutoscroll() {
   const btn = document.getElementById('autoscroll-btn');
   btn.textContent = `↓ Auto-scroll ${autoscroll ? 'ON' : 'OFF'}`;
   btn.classList.toggle('on', autoscroll);
+}
+
+// ── ADD WIDGET ──
+const WIDGET_DEFS = {
+  'CPU Usage':    { icon: '⚙️', value: '34%',   label: 'avg last hour',  color: 'var(--accent)' },
+  'Memory Usage': { icon: '🧠', value: '2.1 GB', label: 'of 8 GB used',  color: 'var(--amber)' },
+  'Cost Today':   { icon: '💰', value: '$0.42',  label: 'vs $1.20 avg',  color: 'var(--green)' },
+  'Error Rate':   { icon: '⚠️', value: '0.3%',  label: 'last 24 hours', color: 'var(--red)' },
+  'Queue Depth':  { icon: '📥', value: '7',      label: 'pending items', color: 'var(--amber)' },
+  'Agent Uptime': { icon: '✅', value: '99.8%',  label: 'last 7 days',  color: 'var(--green)' },
+};
+function addWidget(name) {
+  const def = WIDGET_DEFS[name] || { icon: '📊', value: '—', label: name, color: 'var(--accent)' };
+  const id = 'dyn-' + name.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now();
+  const tile = document.createElement('div');
+  tile.className = 'widget glass';
+  tile.id = id;
+  tile.style.cssText = 'display:flex;flex-direction:column;gap:8px;padding:20px;cursor:pointer;';
+  tile.innerHTML = `
+    <div style="font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:0.12em;color:var(--text-dim);text-transform:uppercase">${name}</div>
+    <div style="font-size:28px;font-weight:800;color:${def.color};line-height:1;margin-top:4px">${def.value}</div>
+    <div style="font-size:11px;color:var(--text-muted);margin-top:auto">${def.icon} ${def.label}</div>`;
+  const bento = document.querySelector('.bento');
+  const blank = document.getElementById('blank-widget');
+  bento.insertBefore(tile, blank);
+  closeCustomizer();
+  showToast(`${name} widget added`);
 }
 
 // ── TOAST ──
