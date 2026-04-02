@@ -72,6 +72,20 @@ class Settings(BaseSettings):
     # the daily_brief tool, which stores the preference in Supabase user_prefs.
     digest_send_time_pt: str = "07:00"
 
+    # Reporter — weekly ops digest (Slice 15+)
+    # Send time for the weekly Sunday digest (HH:MM, 24h, Pacific).
+    reporter_weekly_send_time_pt: str = "09:00"
+
+    # Auditor — observability and anomaly detection (Slice 16+)
+    # How often (in seconds) the auditor checks for cost/error/stale-approval anomalies.
+    auditor_interval_seconds: int = 900  # 15 minutes
+    # Daily USD cost threshold in cents. Alert when spend exceeds this. 0 = disabled.
+    cost_alert_threshold_cents: int = 500  # $5.00
+    # Number of new errors per auditor interval that triggers an error-spike alert. 0 = disabled.
+    auditor_error_rate_threshold: int = 5
+    # Minutes an approval can sit open before the auditor fires a stale-approval alert. 0 = disabled.
+    auditor_stale_approval_minutes: int = 60
+
 
 # Single shared instance — import this everywhere, never instantiate Settings again
 settings = Settings()
