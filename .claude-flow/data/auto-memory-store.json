@@ -1,0 +1,119 @@
+[
+  {
+    "id": "mem-MEMORY-memory-index",
+    "key": "memory-index",
+    "content": "- [Jake Profile](user_jake.md) — systems-minded technical founder, ADHD, Henderson NV, $500K/yr goal by 2026\n- [CallIntel Direction](project_callintel.md) — CallIntel identified as primary product to finish and monetize first; positioned as AI call intelligence SaaS for home services\n- [Feedback: Response Style](feedback_style.md) — Jake wants unfiltered pushback, not agreement; prefers when I diverge from other AI advice",
+    "summary": "Memory Index",
+    "namespace": "core",
+    "type": "semantic",
+    "metadata": {
+      "sourceFile": "/Users/gatsv/.claude/projects/-Users-gatsv/memory/MEMORY.md",
+      "bootstrapped": true
+    },
+    "createdAt": 1775181002053
+  },
+  {
+    "id": "mem-feedback_style----",
+    "key": "-",
+    "content": "name: Feedback: Response Style\ndescription: How Jake wants Claude to engage — unfiltered, divergent from other AI advice when warranted\ntype: feedback\n---\n\nJake wants genuine pushback, not validation. When he brings in analysis from other AIs (Manus, Perplexity, GPT), he explicitly wants me to do my own analysis and disagree where warranted — not synthesize or agree by default.\n\n**Why:** He talked to Manus for less than 24hrs and got a generic plan built for a stranger. He knows I know him bette",
+    "summary": "---",
+    "namespace": "feedback_style",
+    "type": "semantic",
+    "metadata": {
+      "sourceFile": "/Users/gatsv/.claude/projects/-Users-gatsv/memory/feedback_style.md",
+      "bootstrapped": true
+    },
+    "createdAt": 1775181002053
+  },
+  {
+    "id": "mem-project_callintel----",
+    "key": "-",
+    "content": "name: CallIntel Direction\ndescription: Strategic direction for CallIntel — positioning, market, architecture, and plan\ntype: project\n---\n\nCallIntel is Jake's primary business to finish and monetize. It exists at ~/CODING/callintel.\n\n**Positioning:** AI call-to-revenue intelligence for HVAC, plumbing, and home service businesses. Not \"AI automation\" — specifically call intelligence + CRM automation. The gap: CallRail does call tracking (who called), not call intelligence (what to do about it). Go",
+    "summary": "---",
+    "namespace": "project_callintel",
+    "type": "semantic",
+    "metadata": {
+      "sourceFile": "/Users/gatsv/.claude/projects/-Users-gatsv/memory/project_callintel.md",
+      "bootstrapped": true
+    },
+    "createdAt": 1775181002053
+  },
+  {
+    "id": "mem-user_jake----",
+    "key": "-",
+    "content": "name: Jake Profile\ndescription: Jake's background, working style, goals, and what makes him different from a typical user\ntype: user\n---\n\nJake (GATSV), ~28, Henderson Nevada. Runs GATSV Systems Lab and Sleepy Physics Lab (calm physics YouTube). Technical: Python/FastAPI, JS/Node, Bash, Next.js, Supabase, Claude SDK, VPS/Docker/GitHub. Comfortable with APIs, full-stack, async patterns.\n\nGoal: $500K+/year by end of 2026 from a scalable AI business.\n\nHas ADHD — functions best with one clear action ",
+    "summary": "---",
+    "namespace": "user_jake",
+    "type": "semantic",
+    "metadata": {
+      "sourceFile": "/Users/gatsv/.claude/projects/-Users-gatsv/memory/user_jake.md",
+      "bootstrapped": true
+    },
+    "createdAt": 1775181002053
+  },
+  {
+    "id": "mem-MEMORY-project",
+    "key": "project",
+    "content": "- **Name:** AgentLabs AI Hub\n- **Path:** `/Users/gatsv/CODING/ai-hub`\n- **Stack:** Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4, Shadcn UI, Radix UI\n- **Dev server:** `npm run dev` on port 3000 (launch config: \"AgentHub Dev\")",
+    "summary": "Project",
+    "namespace": "core",
+    "type": "semantic",
+    "metadata": {
+      "sourceFile": "/Users/gatsv/.claude/projects/-Users-gatsv-CODING/memory/MEMORY.md",
+      "bootstrapped": true
+    },
+    "createdAt": 1775181002054
+  },
+  {
+    "id": "mem-MEMORY-what-it-does",
+    "key": "what-it-does",
+    "content": "Pay-per-minute AI agent marketplace. Users buy credits via Stripe, then chat with specialized AI agents billed at $0.75/min.",
+    "summary": "What It Does",
+    "namespace": "core",
+    "type": "semantic",
+    "metadata": {
+      "sourceFile": "/Users/gatsv/.claude/projects/-Users-gatsv-CODING/memory/MEMORY.md",
+      "bootstrapped": true
+    },
+    "createdAt": 1775181002054
+  },
+  {
+    "id": "mem-MEMORY-key-integrations",
+    "key": "key-integrations",
+    "content": "- **Anthropic** (claude-sonnet-4-6) — AI chat streaming\n- **Supabase** — PostgreSQL DB + Auth (email/password, session cookies)\n- **Stripe** — Checkout + webhooks for credit purchases",
+    "summary": "Key Integrations",
+    "namespace": "core",
+    "type": "semantic",
+    "metadata": {
+      "sourceFile": "/Users/gatsv/.claude/projects/-Users-gatsv-CODING/memory/MEMORY.md",
+      "bootstrapped": true
+    },
+    "createdAt": 1775181002054
+  },
+  {
+    "id": "mem-MEMORY-architecture",
+    "key": "architecture",
+    "content": "### Routes (`src/app/`)\n- `/` — Landing page\n- `/login`, `/signup` — Auth pages\n- `/dashboard` — Credits/billing (buy packs: $10/$25/$50)\n- `/marketplace` — Agent listing\n- `/marketplace/[agentId]` — Chat session page\n\n### API Routes\n- `POST /api/auth/login` — Supabase signInWithPassword, sets cookie\n- `POST /api/auth/signup` — Supabase signUp\n- `POST /api/chat` — Streams Claude response (SSE format)\n- `GET /api/billing/balance` — Returns user balance_cents\n- `POST /api/billing/checkout` — Creat",
+    "summary": "Architecture",
+    "namespace": "core",
+    "type": "semantic",
+    "metadata": {
+      "sourceFile": "/Users/gatsv/.claude/projects/-Users-gatsv-CODING/memory/MEMORY.md",
+      "bootstrapped": true
+    },
+    "createdAt": 1775181002054
+  },
+  {
+    "id": "mem-MEMORY-env-vars-required",
+    "key": "env-vars-required",
+    "content": "ANTHROPIC_API_KEY, OPENAI_API_KEY (unused), NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY, NEXT_PUBLIC_APP_URL",
+    "summary": "Env Vars Required",
+    "namespace": "core",
+    "type": "semantic",
+    "metadata": {
+      "sourceFile": "/Users/gatsv/.claude/projects/-Users-gatsv-CODING/memory/MEMORY.md",
+      "bootstrapped": true
+    },
+    "createdAt": 1775181002054
+  }
+]

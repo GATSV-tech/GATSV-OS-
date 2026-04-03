@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "updatedAt": 1775181002056,
+  "nodeCount": 9,
+  "nodes": {
+    "mem-MEMORY-memory-index": {
+      "id": "mem-MEMORY-memory-index",
+      "category": "core",
+      "confidence": 0.5,
+      "accessCount": 0,
+      "createdAt": 1775181002053
+    },
+    "mem-feedback_style----": {
+      "id": "mem-feedback_style----",
+      "category": "feedback_style",
+      "confidence": 0.5,
+      "accessCount": 0,
+      "createdAt": 1775181002053
+    },
+    "mem-project_callintel----": {
+      "id": "mem-project_callintel----",
+      "category": "project_callintel",
+      "confidence": 0.5,
+      "accessCount": 0,
+      "createdAt": 1775181002053
+    },
+    "mem-user_jake----": {
+      "id": "mem-user_jake----",
+      "category": "user_jake",
+      "confidence": 0.5,
+      "accessCount": 0,
+      "createdAt": 1775181002053
+    },
+    "mem-MEMORY-project": {
+      "id": "mem-MEMORY-project",
+      "category": "core",
+      "confidence": 0.5,
+      "accessCount": 0,
+      "createdAt": 1775181002054
+    },
+    "mem-MEMORY-what-it-does": {
+      "id": "mem-MEMORY-what-it-does",
+      "category": "core",
+      "confidence": 0.5,
+      "accessCount": 0,
+      "createdAt": 1775181002054
+    },
+    "mem-MEMORY-key-integrations": {
+      "id": "mem-MEMORY-key-integrations",
+      "category": "core",
+      "confidence": 0.5,
+      "accessCount": 0,
+      "createdAt": 1775181002054
+    },
+    "mem-MEMORY-architecture": {
+      "id": "mem-MEMORY-architecture",
+      "category": "core",
+      "confidence": 0.5,
+      "accessCount": 0,
+      "createdAt": 1775181002054
+    },
+    "mem-MEMORY-env-vars-required": {
+      "id": "mem-MEMORY-env-vars-required",
+      "category": "core",
+      "confidence": 0.5,
+      "accessCount": 0,
+      "createdAt": 1775181002054
+    }
+  },
+  "edges": [
+    {
+      "sourceId": "mem-MEMORY-project",
+      "targetId": "mem-MEMORY-what-it-does",
+      "type": "temporal",
+      "weight": 0.5
+    },
+    {
+      "sourceId": "mem-MEMORY-what-it-does",
+      "targetId": "mem-MEMORY-key-integrations",
+      "type": "temporal",
+      "weight": 0.5
+    },
+    {
+      "sourceId": "mem-MEMORY-key-integrations",
+      "targetId": "mem-MEMORY-architecture",
+      "type": "temporal",
+      "weight": 0.5
+    },
+    {
+      "sourceId": "mem-MEMORY-architecture",
+      "targetId": "mem-MEMORY-env-vars-required",
+      "type": "temporal",
+      "weight": 0.5
+    }
+  ],
+  "pageRanks": {
+    "mem-MEMORY-memory-index": 0.06128293236970105,
+    "mem-feedback_style----": 0.06128293236970105,
+    "mem-project_callintel----": 0.06128293236970105,
+    "mem-user_jake----": 0.06128293236970105,
+    "mem-MEMORY-project": 0.06128293236970105,
+    "mem-MEMORY-what-it-does": 0.11337347813304574,
+    "mem-MEMORY-key-integrations": 0.15765045981271777,
+    "mem-MEMORY-architecture": 0.19528577010181336,
+    "mem-MEMORY-env-vars-required": 0.2272756301039178
+  }
+}
