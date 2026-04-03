@@ -1,0 +1,105 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1775174889066,
+  "projectRoot": "/Users/gatsv/CODING/gatsv-os",
+  "techStack": {
+    "languages": [],
+    "frameworks": [],
+    "packageManager": null,
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [
+      "docs",
+      "scripts"
+    ],
+    "gitBranches": null
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "deploy": {
+      "path": "deploy",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1775174888891,
+      "keyFiles": [
+        "gatsv-os.service",
+        "nginx.conf"
+      ]
+    },
+    "docs": {
+      "path": "docs",
+      "purpose": "Documentation",
+      "fileCount": 1,
+      "lastAccessed": 1775174888896,
+      "keyFiles": [
+        "deploy.md"
+      ]
+    },
+    "frontend": {
+      "path": "frontend",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1775174888899,
+      "keyFiles": [
+        "gatsv-dashboard.html",
+        "gatsv-landing.html"
+      ]
+    },
+    "paperclip": {
+      "path": "paperclip",
+      "purpose": null,
+      "fileCount": 16,
+      "lastAccessed": 1775174888901,
+      "keyFiles": [
+        "AGENTS.md",
+        "CONTRIBUTING.md",
+        "Dockerfile",
+        "LICENSE",
+        "README.md"
+      ]
+    },
+    "scripts": {
+      "path": "scripts",
+      "purpose": "Build/utility scripts",
+      "fileCount": 3,
+      "lastAccessed": 1775174888913,
+      "keyFiles": [
+        "commit-session.sh",
+        "deploy.sh",
+        "setup-vps.sh"
+      ]
+    },
+    "services": {
+      "path": "services",
+      "purpose": "Business logic services",
+      "fileCount": 0,
+      "lastAccessed": 1775174888921,
+      "keyFiles": []
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "frontend/gatsv-landing.html",
+      "accessCount": 8,
+      "lastAccessed": 1775174964782,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}

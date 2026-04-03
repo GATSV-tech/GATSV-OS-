@@ -115,7 +115,7 @@ body {
 .corner {
   position: absolute;
   width: 40px; height: 40px;
-  z-index: 2;
+  z-index: 0;
   pointer-events: none;
 }
 .corner::before, .corner::after {
@@ -129,7 +129,7 @@ body {
 .corner-tr { top: 80px; right: 64px; }
 .corner-tr::before { top:0; right:0; width:100%; height:1px; }
 .corner-tr::after  { top:0; right:0; width:1px;  height:100%; }
-.corner-bl { bottom: 80px; left: 64px; }
+.corner-bl { bottom: 80px; left: 40px; }
 .corner-bl::before { bottom:0; left:0; width:100%; height:1px; }
 .corner-bl::after  { bottom:0; left:0; width:1px; height:100%; }
 .corner-br { bottom: 80px; right: 64px; }
@@ -138,7 +138,7 @@ body {
 
 .hero-content {
   position: relative;
-  z-index: 2;
+  z-index: 1;
   max-width: 1100px;
 }
 
@@ -739,10 +739,11 @@ footer {
 <nav id="nav">
   <a href="#" class="nav-logo">GATSV OS</a>
   <ul class="nav-links">
-    <li><a href="#what">Product</a></li>
+    <li><a href="#features">Product</a></li>
     <li><a href="#pricing">Pricing</a></li>
-    <li><a href="#">Docs</a></li>
-    <li><a href="#pricing" class="nav-btn">Request Access</a></li>
+    <li><a href="docs.html">Docs</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="contact.html" class="nav-btn">Request Access</a></li>
   </ul>
 </nav>
 
@@ -771,8 +772,8 @@ footer {
     </p>
 
     <div class="hero-ctas">
-      <a href="#pricing" class="btn-primary">Request Early Access →</a>
-      <a href="#how" class="btn-secondary">See How It Works</a>
+      <a href="contact.html" class="btn-primary">Request Early Access →</a>
+      <a href="demo.html" class="btn-secondary">See How It Works</a>
     </div>
 
     <div class="hero-trust">Built on — Claude · Postmark · Slack · Supabase · Sendblue</div>
@@ -957,7 +958,7 @@ footer {
         <li>Monthly ops review call</li>
         <li>Priority support via Slack</li>
       </ul>
-      <a href="#" class="pricing-cta filled">Get Started →</a>
+      <a href="contact.html" class="pricing-cta filled">Get Started →</a>
     </div>
 
     <div class="pricing-card pro reveal" style="transition-delay:0.2s">
@@ -973,7 +974,7 @@ footer {
         <li>SLA guarantees</li>
         <li>Quarterly business reviews</li>
       </ul>
-      <a href="mailto:hello@gatsv.com" class="pricing-cta outlined">Contact Us →</a>
+      <a href="contact.html" class="pricing-cta outlined">Contact Us →</a>
     </div>
 
   </div>
@@ -990,20 +991,20 @@ footer {
   <div class="footer-col">
     <h4>Product</h4>
     <ul>
-      <li><a href="gatsv-dashboard.html">Dashboard</a></li>
-      <li><a href="#pricing">Request Access</a></li>
-      <li><a href="#">Documentation</a></li>
-      <li><a href="#">Changelog</a></li>
+      <li><a href="login.html">Dashboard</a></li>
+      <li><a href="contact.html">Request Access</a></li>
+      <li><a href="docs.html">Documentation</a></li>
+      <li><a href="changelog.html">Changelog</a></li>
     </ul>
   </div>
 
   <div class="footer-col">
     <h4>Company</h4>
     <ul>
-      <li><a href="#">About</a></li>
-      <li><a href="mailto:hello@gatsv.com">Contact</a></li>
-      <li><a href="#">Privacy</a></li>
-      <li><a href="#">Terms</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="privacy.html">Privacy</a></li>
+      <li><a href="terms.html">Terms</a></li>
     </ul>
   </div>
 
