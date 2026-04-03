@@ -96,8 +96,20 @@
   "hotPaths": [
     {
       "path": "frontend/gatsv-landing.html",
-      "accessCount": 8,
-      "lastAccessed": 1775174964782,
+      "accessCount": 9,
+      "lastAccessed": 1775178018572,
+      "type": "file"
+    },
+    {
+      "path": "docs/handoff/current-state.md",
+      "accessCount": 1,
+      "lastAccessed": 1775178011363,
+      "type": "file"
+    },
+    {
+      "path": "frontend/gatsv-dashboard.html",
+      "accessCount": 1,
+      "lastAccessed": 1775178019077,
       "type": "file"
     }
   ],
