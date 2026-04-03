@@ -111,6 +111,12 @@
       "accessCount": 2,
       "lastAccessed": 1775181051697,
       "type": "file"
+    },
+    {
+      "path": "",
+      "accessCount": 1,
+      "lastAccessed": 1775216081472,
+      "type": "directory"
     }
   ],
   "userDirectives": []

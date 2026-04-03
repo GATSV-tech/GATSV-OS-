@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "computedAt": 1775181002057,
+  "computedAt": 1775215659658,
   "entries": [
     {
       "id": "mem-MEMORY-env-vars-required",
@@ -358,9 +358,9 @@
       "content": "name: Jake Profile\ndescription: Jake's background, working style, goals, and what makes him different from a typical user\ntype: user\n---\n\nJake (GATSV), ~28, Henderson Nevada. Runs GATSV Systems Lab and Sleepy Physics Lab (calm physics YouTube). Technical: Python/FastAPI, JS/Node, Bash, Next.js, Supabase, Claude SDK, VPS/Docker/GitHub. Comfortable with APIs, full-stack, async patterns.\n\nGoal: $500K+/year by end of 2026 from a scalable AI business.\n\nHas ADHD — functions best with one clear action ",
       "summary": "---",
       "category": "user_jake",
-      "confidence": 0.5,
+      "confidence": 0.53,
       "pageRank": 0.06128293236970105,
-      "accessCount": 0,
+      "accessCount": 1,
       "words": [
         "name",
         "jake",

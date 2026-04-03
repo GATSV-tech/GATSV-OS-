@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": 1775181002056,
+  "updatedAt": 1775215659657,
   "nodeCount": 9,
   "nodes": {
     "mem-MEMORY-memory-index": {
@@ -27,8 +27,8 @@
     "mem-user_jake----": {
       "id": "mem-user_jake----",
       "category": "user_jake",
-      "confidence": 0.5,
-      "accessCount": 0,
+      "confidence": 0.53,
+      "accessCount": 1,
       "createdAt": 1775181002053
     },
     "mem-MEMORY-project": {
