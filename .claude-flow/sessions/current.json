@@ -5,18 +5,18 @@
   "context": {
     "lastMatchedPatterns": [
       "mem-MEMORY-architecture",
-      "mem-MEMORY-memory-index",
-      "mem-project_callintel----",
       "mem-MEMORY-env-vars-required",
-      "mem-MEMORY-key-integrations"
+      "mem-MEMORY-key-integrations",
+      "mem-user_jake----",
+      "mem-MEMORY-memory-index"
     ]
   },
   "metrics": {
-    "edits": 0,
+    "edits": 21,
     "commands": 0,
     "tasks": 0,
     "errors": 0
   },
-  "updatedAt": "2026-04-03T11:33:59.069Z",
+  "updatedAt": "2026-04-03T11:49:15.675Z",
   "restoredAt": "2026-04-03T11:27:39.645Z"
 }

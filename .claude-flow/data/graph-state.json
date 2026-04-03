@@ -6,8 +6,8 @@
     "mem-MEMORY-memory-index": {
       "id": "mem-MEMORY-memory-index",
       "category": "core",
-      "confidence": 0.5,
-      "accessCount": 0,
+      "confidence": 0.6000000000000001,
+      "accessCount": 2,
       "createdAt": 1775181002053
     },
     "mem-feedback_style----": {
@@ -20,15 +20,15 @@
     "mem-project_callintel----": {
       "id": "mem-project_callintel----",
       "category": "project_callintel",
-      "confidence": 0.5,
-      "accessCount": 0,
+      "confidence": 0.53,
+      "accessCount": 1,
       "createdAt": 1775181002053
     },
     "mem-user_jake----": {
       "id": "mem-user_jake----",
       "category": "user_jake",
-      "confidence": 0.53,
-      "accessCount": 1,
+      "confidence": 0.6300000000000001,
+      "accessCount": 3,
       "createdAt": 1775181002053
     },
     "mem-MEMORY-project": {
@@ -48,22 +48,22 @@
     "mem-MEMORY-key-integrations": {
       "id": "mem-MEMORY-key-integrations",
       "category": "core",
-      "confidence": 0.5,
-      "accessCount": 0,
+      "confidence": 0.6000000000000001,
+      "accessCount": 2,
       "createdAt": 1775181002054
     },
     "mem-MEMORY-architecture": {
       "id": "mem-MEMORY-architecture",
       "category": "core",
-      "confidence": 0.5,
-      "accessCount": 0,
+      "confidence": 0.6000000000000001,
+      "accessCount": 2,
       "createdAt": 1775181002054
     },
     "mem-MEMORY-env-vars-required": {
       "id": "mem-MEMORY-env-vars-required",
       "category": "core",
-      "confidence": 0.5,
-      "accessCount": 0,
+      "confidence": 0.6000000000000001,
+      "accessCount": 2,
       "createdAt": 1775181002054
     }
   },
