@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     slack_bot_token: Optional[str] = None
     slack_signing_secret: Optional[str] = None
     slack_ops_channel_id: Optional[str] = None
+    discord_webhook_url: Optional[str] = None
 
     # Postmark — required for email connector (Slice 3+)
     postmark_inbound_webhook_secret: Optional[str] = None
@@ -65,6 +66,9 @@ class Settings(BaseSettings):
     # Time (HH:MM, 24h, Pacific) the Slack daily summary is posted each day.
     slack_summary_time_pt: str = "08:00"
 
+    # Brave Search — required for web_search tool
+    brave_api_key: Optional[str] = None
+
     # Daily digest — proactive morning summary (Slice 10+)
     # Jake's phone number — required for all proactive outbound sends.
     jake_phone_number: Optional[str] = None
@@ -88,9 +92,11 @@ class Settings(BaseSettings):
 
     # Lumen vault — GitHub-backed Obsidian vault for note capture (Slice 17+)
     # GitHub personal access token with repo scope for GATSV-tech/Lumen-Vault.
-    github_token: Optional[str] = None
-    lumen_vault_repo: str = "GATSV-tech/Lumen-Vault"
-    lumen_inbox_path: str = "02 - Ideas/Inbox.md"
+    github_vault_token: Optional[str] = None
+
+    # Notion CRM — investor pipeline database
+    notion_token: Optional[str] = None
+    notion_crm_db: Optional[str] = None
 
 
 # Single shared instance — import this everywhere, never instantiate Settings again
