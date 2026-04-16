@@ -86,9 +86,10 @@ async def _add_investor(tool_input: dict, _ctx: ToolContext) -> ToolResult:
 register(ToolDefinition(
     name="add_investor",
     description=(
-        "Add a new investor or VC contact to the AXIS MARKET INVESTORS CRM. "
-        "Use when the user says things like 'add [name] to investor CRM', "
-        "'log a new investor: [name] from [firm]', or 'new investor lead: ...'. "
+        "Add a new investor or VC contact to the AXIS MARKET INVESTORS CRM in Notion. "
+        "Use when the user mentions an investor name with words like: "
+        "'new investor', 'log investor', 'investor lead', 'add to CRM', 'add to investor CRM', "
+        "'VC lead', 'angel lead', or 'fund lead'. "
         "Required: name. Optional: firm, email, "
         "type (VC/ANGEL/FUND/FAMILY OFFICE/STRATEGIC), "
         "priority (HOT/WARM/COLD), "

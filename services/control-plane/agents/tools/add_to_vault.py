@@ -67,9 +67,9 @@ register(
         name="add_to_vault",
         description=(
             "Add an idea or note to Jake's Obsidian vault inbox. "
-            "Use when the user says: vault this, add to vault, idea:, obsidian:, "
+            "Use ONLY when the user says: vault this, add to vault, idea:, obsidian:, "
             "add this to obsidian, save to vault. "
-            "Do NOT use for timed reminders or regular quick notes."
+            "Do NOT use for: timed reminders, regular notes, or anything investor/CRM related."
         ),
         input_schema={
             "type": "object",
