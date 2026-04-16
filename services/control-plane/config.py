@@ -86,6 +86,12 @@ class Settings(BaseSettings):
     # Minutes an approval can sit open before the auditor fires a stale-approval alert. 0 = disabled.
     auditor_stale_approval_minutes: int = 60
 
+    # Lumen vault — GitHub-backed Obsidian vault for note capture (Slice 17+)
+    # GitHub personal access token with repo scope for GATSV-tech/Lumen-Vault.
+    github_token: Optional[str] = None
+    lumen_vault_repo: str = "GATSV-tech/Lumen-Vault"
+    lumen_inbox_path: str = "02 - Ideas/Inbox.md"
+
 
 # Single shared instance — import this everywhere, never instantiate Settings again
 settings = Settings()
